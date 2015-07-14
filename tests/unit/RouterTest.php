@@ -65,7 +65,7 @@ class RouterTest extends \Codeception\TestCase\Test
         });
 
         $this->specify('should extract route params', function () use ($router) {
-            $router->get('/news/{id}', 'handler2');
+            $router->get('/news/<id>', 'handler2');
             $result = $router->resolve('GET', '/news/1');
 
             $this->assertEquals('handler2', $result->handler);
@@ -73,8 +73,8 @@ class RouterTest extends \Codeception\TestCase\Test
         });
 
         $this->specify('should match regexp in params', function () use ($router) {
-            $router->get('/users/{name:^[a-zA-Z]+$}', 'handler3');
-            $router->get('/users/{id:^[0-9]+$}', 'handler4');
+            $router->get('/users/<name:^[a-zA-Z]+$>', 'handler3');
+            $router->get('/users/<id:^[0-9]+$>', 'handler4');
 
             $result = $router->resolve('GET', '/users/@test');
             $this->assertIsError($result, 404);

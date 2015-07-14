@@ -4,7 +4,7 @@ namespace TreeRoute;
 
 class Router
 {
-    const PARAM_REGEXP = '/^{((([^:]+):(.+))|(.+))}$/';
+    const PARAM_REGEXP = '/^<((([^:]+):(.+))|(.+))>$/';
     const SEPARATOR_REGEXP = '/^[\s\/]+|[\s\/]+$/';
 
     /**
