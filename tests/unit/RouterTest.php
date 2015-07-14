@@ -104,5 +104,22 @@ class RouterTest extends \Codeception\TestCase\Test
             $result = $router->resolve('GET', '/');
             $this->assertEquals('handler0', $result->handler);
         });
+
+        $this->specify('should handle pattern substitutions', function () use ($router) {
+            $router->get('/year/<year:int>', 'year');
+
+            $result = $router->resolve('GET', '/year/2020');
+            $this->assertEquals('year', $result->handler);
+            $this->assertEquals('2020', $result->params['year']);
+        });
+
+        $this->specify('should match multiple params in one part', function () use ($router) {
+            $router->get('/archive-<year:int>-<month:int>-<day:int>', 'archive');
+            $result = $router->resolve('GET', '/archive-2015-31-01');
+            $this->assertEquals('archive', $result->handler);
+            $this->assertEquals('2015', $result->params['year']);
+            $this->assertEquals('31', $result->params['month']);
+            $this->assertEquals('01', $result->params['day']);
+        });
     }
 }

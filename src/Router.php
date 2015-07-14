@@ -2,9 +2,10 @@
 
 namespace TreeRoute;
 
+use RuntimeException;
+
 class Router
 {
-    const PARAM_REGEXP = '/^<((([^:]+):(.+))|(.+))>$/';
     const SEPARATOR_REGEXP = '/^[\s\/]+|[\s\/]+$/';
 
     /**
@@ -12,9 +13,94 @@ class Router
      */
     private $routes;
 
+    /**
+     * A map of regular expression pattern substitutions to apply to every
+     * pattern encountered, as a means fo pre-processing patterns. Provides a
+     * useful means of adding your own custom patterns for convenient reuse.
+     *
+     * @var callable[] map where full regular expression => substitution closure
+     */
+    public $substitutions = array();
+
+    /**
+     * Symbols used by the built-in standard substitution pattern, which provides
+     * a convenient short-hand syntax for placeholder tokens. The built-in standard
+     * symbols are:
+     *
+     * <pre>
+     *     'int'  => '\d+'
+     *     'slug' => '[a-z0-9-]+'
+     * </pre>
+     *
+     * Which provides support for simplified named routes, such as:
+     *
+     * <pre>
+     *     'user/<user_id:int>'
+     *     'tags/<tag:slug>'
+     * </pre>
+     *
+     * For which the resulting patterns would be:
+     *
+     * <pre>
+     *     'user/(?<user_id:\d+>)'
+     *     'tags/(?<slug:[a-z0-9-]>)'
+     * </pre>
+     *
+     * @var string[] map where symbol name => partial regular expression
+     */
+    public $symbols = array();
+
     public function __construct()
     {
         $this->routes = new Route();
+
+        // define a default pattern-substitution with support for some common symbols:
+
+        $router = $this;
+
+        $this->substitutions['/(?<!\(\?)<([^\:]+)(?:$|\:([^>]+)|)>/'] = function ($matches) use ($router) {
+            $pattern = '[^\/]+';
+
+            if (isset($matches[2])) {
+                $pattern = $matches[2];
+
+                if (isset($router->symbols[$pattern])) {
+                    $pattern = $router->symbols[$pattern];
+                }
+            }
+
+            return "(?<{$matches[1]}>{$pattern})";
+        };
+
+        // define common symbols for the default pattern-substitution:
+
+        $this->symbols = array(
+            'int'  => '\d+',
+            'slug' => '[a-z0-9-]+',
+        );
+    }
+
+    /**
+     * Prepares a regular expression pattern by applying the patterns and callbacks
+     * defined by {@link $substitutions} to it.
+     *
+     * @param string $pattern unprocessed pattern
+     *
+     * @return string pre-processed pattern
+     *
+     * @throws RuntimeException if the regular expression fails to execute
+     */
+    private function preparePattern($pattern)
+    {
+        foreach ($this->substitutions as $subpattern => $fn) {
+            $pattern = @preg_replace_callback($subpattern, $fn, $pattern);
+
+            if ($pattern === null) {
+                throw new RuntimeException("invalid substitution pattern: {$subpattern}");
+            }
+        }
+
+        return $pattern;
     }
 
     /**
@@ -32,23 +118,29 @@ class Router
         $params = [];
         $current = $this->routes;
 
-        for ($i = 0, $length = sizeof($parts); $i < $length; $i++) {
-            if (isset($current->childs[$parts[$i]])) {
-                $current = $current->childs[$parts[$i]];
+        foreach ($parts as $part) {
+            if (isset($current->childs[$part])) {
+                $current = $current->childs[$part];
             } else {
-                foreach ($current->regexps as $regexp => $route) {
-                    if (preg_match('/' . addcslashes($regexp, '/') . '/', $parts[$i])) {
+                foreach ($current->regexps as $pattern => $route) {
+                    /** @var int|bool $match result of preg_match() against $pattern */
+                    $match = @preg_match('#^' . $pattern . '(?=$)#', $part, $matches);
+
+                    if ($match === false) {
+                        throw new RuntimeException("invalid pattern '{$pattern}' (preg_match returned false)");
+                    }
+
+                    if ($match === 1) {
                         $current = $route;
-                        $params[$current->name] = $parts[$i];
+
+                        foreach ($matches as $name => $value) {
+                            $params[$name] = $value;
+                        }
+
                         continue 2;
                     }
                 }
-                if ($current->others) {
-                    $current = $current->others;
-                    $params[$current->name] = $parts[$i];
-                } else {
-                    return null;
-                }
+                return null;
             }
         }
 
@@ -61,18 +153,6 @@ class Router
                 $params
             );
         }
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return Route
-     */
-    private function createRouteWithName($name)
-    {
-        $route = new Route();
-        $route->name = $name;
-        return $route;
     }
 
     /**
@@ -94,20 +174,16 @@ class Router
 
         $current = $this->routes;
         foreach ($parts as $part) {
-            $paramsMatch = preg_match(self::PARAM_REGEXP, $part, $paramsMatches);
-            if ($paramsMatch) {
-                if (!empty($paramsMatches[2])) {
-                    if (!isset($current->regexps[$paramsMatches[4]])) {
-                        $current->regexps[$paramsMatches[4]] = $this->createRouteWithName($paramsMatches[3]);
-                    }
-                    $current = $current->regexps[$paramsMatches[4]];
-                } else {
-                    if ($current->others === null) {
-                        $current->others = $this->createRouteWithName($paramsMatches[5]);
-                    }
-                    $current = $current->others;
+            $pattern = $this->preparePattern($part);
+
+            if (strpos($pattern, '(?<') !== false) {
+                // pattern contains named parameter capture
+                if (!isset($current->regexps[$pattern])) {
+                    $current->regexps[$pattern] = new Route();
                 }
+                $current = $current->regexps[$pattern];
             } else {
+                // pattern does not contain parameter capture
                 if (!isset($current->childs[$part])) {
                     $current->childs[$part] = new Route();
                 }
