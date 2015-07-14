@@ -124,9 +124,9 @@ class Router
     /**
      * @param string $url
      *
-     * @return string[]|null
+     * @return string[]|null list of supported HTTP method names
      */
-    public function getOptions($url)
+    public function getMethods($url)
     {
         $route = $this->match($url);
         if (!$route) {
