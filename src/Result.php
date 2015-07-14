@@ -5,7 +5,7 @@ namespace TreeRoute;
 /**
  * This class represents the result of an attempted Router dispatch.
  *
- * @see Router::dispatch()
+ * @see Router::resolve()
  */
 class Result
 {

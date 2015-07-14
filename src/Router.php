@@ -142,7 +142,7 @@ class Router
      *
      * @return Result|Error
      */
-    public function dispatch($method, $url)
+    public function resolve($method, $url)
     {
         $match = $this->match($url);
 
