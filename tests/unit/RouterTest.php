@@ -69,16 +69,19 @@ class RouterTest extends \Codeception\TestCase\Test
         });
 
         $this->specify('should extract route params', function () use ($router) {
-            $router->get('/news/<id>', 'handler2');
+            $router->get('/news/<id:int>', 'handler2');
             $result = $router->resolve('GET', '/news/1');
-
+            $this->assertResultIsSuccess($result);
             $this->assertEquals('handler2', $result->handler);
             $this->assertEquals('1', $result->params['id']);
+
+            $result = $router->resolve('GET', '/news/foo');
+            $this->assertResultIsError($result, 404);
         });
 
         $this->specify('should match regexp in params', function () use ($router) {
             $router->get('/users/<name:^[a-zA-Z]+$>', 'handler3');
-            $router->get('/users/<id:^[0-9]+$>', 'handler4');
+            $router->get('/users/<id:int>', 'handler4');
 
             $result = $router->resolve('GET', '/users/@test');
             $this->assertResultIsError($result, 404);
