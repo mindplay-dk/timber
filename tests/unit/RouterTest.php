@@ -21,15 +21,19 @@ class RouterTest extends \Codeception\TestCase\Test
      * @param \TreeRoute\Result $result
      * @param int               $code
      */
-    private function assertIsError(\TreeRoute\Result $result, $code)
+    private function assertResultIsError(\TreeRoute\Result $result, $code)
     {
-        $this->assertEquals($code, $result->error->code);
+        $this->assertNotNull($result->error, 'expected Error instance');
+
+        if ($result->error) {
+            $this->assertEquals($code, $result->error->code);
+        }
     }
 
     /**
      * @param \TreeRoute\Result $result
      */
-    private function assertIsNotError(\TreeRoute\Result $result)
+    private function assertResultIsSuccess(\TreeRoute\Result $result)
     {
         $this->assertEmpty($result->error);
     }
@@ -42,18 +46,18 @@ class RouterTest extends \Codeception\TestCase\Test
 
         $this->specify('should find existed route', function () use ($router) {
             $result = $router->resolve('GET', '/');
-            $this->assertIsNotError($result);
+            $this->assertResultIsSuccess($result);
             $this->assertEquals('handler0', $result->handler);
         });
 
         $this->specify('should return 404 error for not existed route', function () use ($router) {
             $result = $router->resolve('GET', '/not/existed/url');
-            $this->assertIsError($result, 404);
+            $this->assertResultIsError($result, 404);
         });
 
         $this->specify('should return 405 error for unsupported method', function () use ($router) {
             $result = $router->resolve('POST', '/');
-            $this->assertIsError($result, 405);
+            $this->assertResultIsError($result, 405);
             $this->assertEquals(['GET'], $result->error->allowed);
         });
 
@@ -77,7 +81,7 @@ class RouterTest extends \Codeception\TestCase\Test
             $router->get('/users/<id:^[0-9]+$>', 'handler4');
 
             $result = $router->resolve('GET', '/users/@test');
-            $this->assertIsError($result, 404);
+            $this->assertResultIsError($result, 404);
 
             $result = $router->resolve('GET', '/users/bob');
             $this->assertEquals('handler3', $result->handler);
@@ -99,7 +103,7 @@ class RouterTest extends \Codeception\TestCase\Test
             $routes = $router->getRoutes();
             $router = new \TreeRoute\Router();
             $result = $router->resolve('GET', '/');
-            $this->assertIsError($result, 405);
+            $this->assertResultIsError($result, 405);
             $router->setRoutes($routes);
             $result = $router->resolve('GET', '/');
             $this->assertEquals('handler0', $result->handler);
