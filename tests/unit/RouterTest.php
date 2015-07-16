@@ -142,5 +142,14 @@ class RouterTest extends \Codeception\TestCase\Test
             $this->assertEquals('save', $router->resolve('GET', '/admin/menu/save')->handler);
             $this->assertEquals('upload', $router->resolve('POST', '/admin/upload')->handler);
         });
+
+        $this->specify('should dispatch handlers with parameters', function () {
+            $router = new \TreeRoute\Router();
+            $router->get('/content/<id:int>-<title:slug>', function ($id, $title) {
+                return array($id, $title);
+            });
+            $result = $router->dispatch('GET', '/content/123-hello-world');
+            $this->assertEquals(array('123', 'hello-world'), $result);
+        });
     }
 }
