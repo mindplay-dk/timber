@@ -50,6 +50,12 @@ class Router
      */
     public $symbols = array();
 
+    /**
+     * @var string temporary route prefix
+     * @see _with()
+     */
+    private $prefix;
+
     public function __construct()
     {
         $this->routes = new Route();
@@ -121,6 +127,9 @@ class Router
         foreach ($parts as $part) {
             if (isset($current->childs[$part])) {
                 $current = $current->childs[$part];
+                if ($current->init) {
+                    $this->init($current);
+                }
             } else {
                 foreach ($current->regexps as $pattern => $route) {
                     /** @var int|bool $match result of preg_match() against $pattern */
@@ -132,6 +141,10 @@ class Router
 
                     if ($match === 1) {
                         $current = $route;
+
+                        if ($current->init) {
+                            $this->init($current);
+                        }
 
                         foreach ($matches as $name => $value) {
                             $params[$name] = $value;
@@ -156,15 +169,32 @@ class Router
     }
 
     /**
+     * @param Route $route
+     */
+    private function init(Route $route)
+    {
+        $saved = $this->prefix;
+
+        $this->prefix .= $route->route;
+
+        call_user_func($route->init, $this);
+
+        $route->init = null;
+
+        $this->prefix = $saved;
+    }
+
+    /**
      * @param string|string[] $methods HTTP request method (or list of methods)
      * @param string $route
      * @param $handler
      *
-     * @return void
+     * @return Route the created Route object
      */
     public function addRoute($methods, $route, $handler)
     {
         $methods = (array) $methods;
+        $route = $this->prefix . $route;
 
         $parts = explode('?', $route, 1);
         $parts = explode('/', preg_replace(self::SEPARATOR_REGEXP, '', $parts[0]));
@@ -173,6 +203,7 @@ class Router
         }
 
         $current = $this->routes;
+
         foreach ($parts as $part) {
             $pattern = $this->preparePattern($part);
 
@@ -192,9 +223,28 @@ class Router
         }
 
         $current->route = $route;
+
         foreach ($methods as $method) {
             $current->methods[strtoupper($method)] = $handler;
         }
+
+        return $current;
+    }
+
+    /**
+     * Configure the Router with a given route prefix, which will be
+     * applied to all the routes created in the given callback.
+     *
+     * @param string $prefix
+     * @param callable $func function (Router $router) : void
+     *
+     * @return void
+     */
+    public function with($prefix, callable $func)
+    {
+        $route = $this->addRoute(array(), $prefix, null);
+
+        $route->init = $func;
     }
 
     /**

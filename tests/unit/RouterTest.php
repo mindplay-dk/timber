@@ -128,5 +128,19 @@ class RouterTest extends \Codeception\TestCase\Test
             $this->assertEquals('31', $result->params['month']);
             $this->assertEquals('01', $result->params['day']);
         });
+
+        $this->specify('should add routes with a given prefix', function () {
+            $router = new \TreeRoute\Router();
+            $router->with('/admin', function () use ($router) {
+                $router->with('/menu', function () use ($router) {
+                    $router->get('/load', 'load');
+                    $router->get('/save', 'save');
+                });
+                $router->post('/upload', 'upload');
+            });
+            $this->assertEquals('load', $router->resolve('GET', '/admin/menu/load')->handler);
+            $this->assertEquals('save', $router->resolve('GET', '/admin/menu/save')->handler);
+            $this->assertEquals('upload', $router->resolve('POST', '/admin/upload')->handler);
+        });
     }
 }

@@ -26,4 +26,9 @@ class Route
      * @var Route[] map where regular expression => nested Route instance
      */
     public $regexps = array();
+
+    /**
+     * @var callable|null route initialization function (Router $router) : void
+     */
+    public $init;
 }
