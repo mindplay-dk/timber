@@ -73,7 +73,7 @@ class RouterTest extends \Codeception\TestCase\Test
             $result = $router->resolve('GET', '/news/1');
             $this->assertResultIsSuccess($result);
             $this->assertEquals('handler2', $result->handler);
-            $this->assertEquals('1', $result->params['id']);
+            $this->assertEquals(1, $result->params['id']);
             $this->assertTrue(1 === $result->params['id'], 'int Symbol should convert to int');
 
             $result = $router->resolve('GET', '/news/foo');
@@ -93,7 +93,7 @@ class RouterTest extends \Codeception\TestCase\Test
 
             $result = $router->resolve('GET', '/users/123');
             $this->assertEquals('handler4', $result->handler);
-            $this->assertEquals('123', $result->params['id']);
+            $this->assertEquals(123, $result->params['id']);
         });
 
         $this->specify('should give greater priority to statically defined route', function () use ($router) {
@@ -118,16 +118,16 @@ class RouterTest extends \Codeception\TestCase\Test
 
             $result = $router->resolve('GET', '/year/2020');
             $this->assertEquals('year', $result->handler);
-            $this->assertEquals('2020', $result->params['year']);
+            $this->assertEquals(2020, $result->params['year']);
         });
 
         $this->specify('should match multiple params in one part', function () use ($router) {
             $router->get('/archive-<year:int>-<month:int>-<day:int>', 'archive');
             $result = $router->resolve('GET', '/archive-2015-31-01');
             $this->assertEquals('archive', $result->handler);
-            $this->assertEquals('2015', $result->params['year']);
-            $this->assertEquals('31', $result->params['month']);
-            $this->assertEquals('01', $result->params['day']);
+            $this->assertEquals(2015, $result->params['year']);
+            $this->assertEquals(31, $result->params['month']);
+            $this->assertEquals(1, $result->params['day']);
         });
 
         $this->specify('should add routes with a given prefix', function () {
@@ -156,7 +156,7 @@ class RouterTest extends \Codeception\TestCase\Test
         $this->specify('can create named routes', function () {
             $router = new \TreeRoute\Router();
             $router->get('/content/<id:int>/<title:slug>', 'handler')->name('content');
-            $this->assertEquals('/content/123/hello-world', $router->createRoute('content', ['id' => 123, 'title' => 'hello-world']));
+            $this->assertEquals('/content/123/hello-world', $router->createRoute('content', ['id' => 123, 'title' => 'Hello, World!']));
         });
     }
 }

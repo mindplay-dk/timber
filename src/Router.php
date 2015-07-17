@@ -62,6 +62,12 @@ class Router
     protected $symbols = array();
 
     /**
+     * @var int
+     * @see sanitize()
+     */
+    protected $slug_max_length = 100;
+
+    /**
      * @var string temporary route prefix
      * @see with()
      */
@@ -101,9 +107,34 @@ class Router
             'slug',
             '[a-z0-9-]+',
             function ($value) {
-                return strval($value); // TODO grab a slug generator from somewhere (WordPress, Drupal?)
+                $value = strval($value);
+
+                return $this->sanitize($value);
             }
         );
+    }
+
+    /**
+     * @param $string
+     *
+     * @return string
+     *
+     * @link https://github.com/vito/chyrp/blob/35c646dda657300b345a233ab10eaca7ccd4ec10/includes/helpers.php#L515
+     */
+    function sanitize($string) {
+        static $strip = array("~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]",
+            "}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;",
+            "—", "–", ",", "<", ".", ">", "/", "?");
+
+        $clean = trim(str_replace($strip, "", strip_tags($string)));
+        $clean = preg_replace('/\s+/', "-", $clean);
+        $clean = preg_replace("/[^a-zA-Z0-9-]/", "", $clean);
+        $clean = substr($clean, 0, $this->slug_max_length);
+        $clean = function_exists('mb_strtolower') ?
+            mb_strtolower($clean, 'UTF-8') :
+            strtolower($clean);
+
+        return $clean;
     }
 
     /**
@@ -124,9 +155,10 @@ class Router
     /**
      * Define a symbol name for use in parameter definitions in route patterns
      *
-     * @param string       $name       symbol name
-     * @param string       $expression replacement regular expression
-     * @param Closure|null $encode     optional function to encode a symbol value: `function (mixed $value) : string`
+     * @param string        $name       symbol name
+     * @param string        $expression replacement regular expression
+     * @param callable|null $encode     optional function to encode a symbol value: `function (mixed $value) : string`
+     * @param callable|null $encode     optional function to decode a symbol value: `function (string $value) : mixed`
      *
      * @return void
      *
