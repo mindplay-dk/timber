@@ -355,87 +355,87 @@ class Router
      * @param string $route
      * @param callable $handler
      *
-     * @return void
+     * @return Route
      */
     public function options($route, $handler)
     {
-        $this->addRoute('OPTIONS', $route, $handler);
+        return $this->addRoute('OPTIONS', $route, $handler);
     }
 
     /**
      * @param string $route
      * @param callable $handler
      *
-     * @return void
+     * @return Route
      */
     public function get($route, $handler)
     {
-        $this->addRoute('GET', $route, $handler);
+        return $this->addRoute('GET', $route, $handler);
     }
 
     /**
      * @param string $route
      * @param callable $handler
      *
-     * @return void
+     * @return Route
      */
     public function head($route, $handler)
     {
-        $this->addRoute('HEAD', $route, $handler);
+        return $this->addRoute('HEAD', $route, $handler);
     }
 
     /**
      * @param string $route
      * @param callable $handler
      *
-     * @return void
+     * @return Route
      */
     public function post($route, $handler)
     {
-        $this->addRoute('POST', $route, $handler);
+        return $this->addRoute('POST', $route, $handler);
     }
 
     /**
      * @param string $route
      * @param callable $handler
      *
-     * @return void
+     * @return Route
      */
     public function put($route, $handler)
     {
-        $this->addRoute('PUT', $route, $handler);
+        return $this->addRoute('PUT', $route, $handler);
     }
 
     /**
      * @param string $route
      * @param callable $handler
      *
-     * @return void
+     * @return Route
      */
     public function delete($route, $handler)
     {
-        $this->addRoute('DELETE', $route, $handler);
+        return $this->addRoute('DELETE', $route, $handler);
     }
 
     /**
      * @param string $route
      * @param callable $handler
      *
-     * @return void
+     * @return Route
      */
     public function trace($route, $handler)
     {
-        $this->addRoute('TRACE', $route, $handler);
+        return $this->addRoute('TRACE', $route, $handler);
     }
 
     /**
      * @param string $route
      * @param callable $handler
      *
-     * @return void
+     * @return Route
      */
     public function connect($route, $handler)
     {
-        $this->addRoute('CONNECT', $route, $handler);
+        return $this->addRoute('CONNECT', $route, $handler);
     }
 }
