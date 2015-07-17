@@ -20,12 +20,12 @@ class Result
     public $method;
 
     /**
-     * @var string matched route pattern
+     * @var Route matched Route
      */
     public $route;
 
     /**
-     * @var string[] map where parameter name => parameter value
+     * @var mixed[] map where parameter name => parameter value
      */
     public $params = array();
 

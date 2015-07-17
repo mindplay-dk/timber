@@ -74,6 +74,7 @@ class RouterTest extends \Codeception\TestCase\Test
             $this->assertResultIsSuccess($result);
             $this->assertEquals('handler2', $result->handler);
             $this->assertEquals('1', $result->params['id']);
+            $this->assertTrue(1 === $result->params['id'], 'int Symbol should convert to int');
 
             $result = $router->resolve('GET', '/news/foo');
             $this->assertResultIsError($result, 404);
@@ -150,6 +151,12 @@ class RouterTest extends \Codeception\TestCase\Test
             });
             $result = $router->dispatch('GET', '/content/123-hello-world');
             $this->assertEquals(array('123', 'hello-world'), $result);
+        });
+
+        $this->specify('can create named routes', function () {
+            $router = new \TreeRoute\Router();
+            $router->get('/content/<id:int>/<title:slug>', 'handler')->name('content');
+            $this->assertEquals('/content/123/hello-world', $router->createRoute('content', ['id' => 123, 'title' => 'hello-world']));
         });
     }
 }

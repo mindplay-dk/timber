@@ -10,19 +10,18 @@ namespace TreeRoute;
 class Match
 {
     /**
-     * @param string     $route
+     * @param Route      $route
      * @param callable[] $methods
      * @param string[]   $params
      */
-    public function __construct($route, $methods, $params)
+    public function __construct(Route $route, $params)
     {
         $this->route = $route;
-        $this->methods = $methods;
         $this->params = $params;
     }
 
     /**
-     * @var string the route expression that was matched
+     * @var Route the matched Route
      */
     public $route;
 
