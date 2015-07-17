@@ -11,7 +11,6 @@ class Match
 {
     /**
      * @param Route      $route
-     * @param callable[] $methods
      * @param string[]   $params
      */
     public function __construct(Route $route, $params)

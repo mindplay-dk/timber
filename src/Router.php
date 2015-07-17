@@ -158,7 +158,7 @@ class Router
      * @param string        $name       symbol name
      * @param string        $expression replacement regular expression
      * @param callable|null $encode     optional function to encode a symbol value: `function (mixed $value) : string`
-     * @param callable|null $encode     optional function to decode a symbol value: `function (string $value) : mixed`
+     * @param callable|null $decode     optional function to decode a symbol value: `function (string $value) : mixed`
      *
      * @return void
      *
