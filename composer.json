@@ -1,24 +1,27 @@
 {
-  "name": "baryshev/tree-route",
-  "description": "Perfomance focused request router",
-  "keywords": ["routing", "router"],
-  "license": "BSD-3-Clause",
-  "authors": [
-    {
-      "name": "Vadim Baryshev",
-      "email": "vadimbaryshev@gmail.com"
+    "name": "baryshev/tree-route",
+    "description": "Perfomance focused request router",
+    "keywords": [
+        "routing",
+        "router"
+    ],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Vadim Baryshev",
+            "email": "vadimbaryshev@gmail.com"
+        },
+        {
+            "name": "Rasmus Schultz",
+            "email": "rasmus@mindplay.dk"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0"
     },
-    {
-      "name": "Rasmus Schultz",
-      "email": "rasmus@mindplay.dk"
+    "autoload": {
+        "psr-4": {
+            "TreeRoute\\": "src/"
+        }
     }
-  ],
-  "require": {
-    "php": ">=5.4.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "TreeRoute\\": "src/"
-    }
-  }
 }
