@@ -314,13 +314,13 @@ class Router
             if (strpos($part_pattern, '(?<') !== false) {
                 // pattern contains named parameter capture
                 if (!isset($current->regexps[$part_pattern])) {
-                    $current->regexps[$part_pattern] = new Route($this, $current);
+                    $current->regexps[$part_pattern] = new Route($this);
                 }
                 $current = $current->regexps[$part_pattern];
             } else {
                 // pattern does not contain parameter capture
                 if (!isset($current->children[$part])) {
-                    $current->children[$part] = new Route($this, $current);
+                    $current->children[$part] = new Route($this);
                 }
                 $current = $current->children[$part];
             }

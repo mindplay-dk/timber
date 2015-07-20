@@ -13,7 +13,7 @@ class Route
      * @param Router     $owner
      * @param Route|null $parent
      */
-    public function __construct(Router $owner, Route $parent = null)
+    public function __construct(Router $owner)
     {
         $this->owner = $owner;
     }
@@ -22,11 +22,6 @@ class Route
      * @var Router
      */
     private $owner;
-
-    /**
-     * @var Route parent Route
-     */
-    public $parent;
 
     /**
      * @var string route pattern
