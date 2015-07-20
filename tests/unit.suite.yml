@@ -4,3 +4,7 @@
 class_name: UnitTester
 modules:
     enabled: [Asserts, UnitHelper]
+
+coverage:
+    enabled: true
+    whitelist: src/*
