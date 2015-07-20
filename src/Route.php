@@ -11,7 +11,6 @@ class Route
 {
     /**
      * @param Router     $owner
-     * @param Route|null $parent
      */
     public function __construct(Router $owner)
     {
