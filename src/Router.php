@@ -361,7 +361,7 @@ class Router
                 if (isset($matches[2])) {
                     $pattern = $matches[2];
 
-                    if (isset($this->symbols[$pattern])) {
+                    if (isset($this->symbols[$pattern]->encode)) {
                         return call_user_func($this->symbols[$pattern]->encode, $params[$name]);
                     }
                 }
