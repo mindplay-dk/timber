@@ -343,7 +343,7 @@ class Router
      *
      * @return string
      */
-    public function createRoute($name, $params = array())
+    public function createUrl($name, $params = array())
     {
         if (! isset($this->named_routes[$name])) {
             throw new InvalidArgumentException("no route with the given name has been defined: {$name}");

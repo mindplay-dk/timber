@@ -156,7 +156,7 @@ class RouterTest extends \Codeception\TestCase\Test
         $this->specify('can create named routes', function () {
             $router = new \TreeRoute\Router();
             $router->get('/content/<id:int>/<title:slug>', 'handler')->name('content');
-            $this->assertEquals('/content/123/hello-world', $router->createRoute('content', ['id' => 123, 'title' => 'Hello, World!']));
+            $this->assertEquals('/content/123/hello-world', $router->createUrl('content', ['id' => 123, 'title' => 'Hello, World!']));
         });
     }
 }
