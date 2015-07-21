@@ -10,19 +10,6 @@ use RuntimeException;
 class Route
 {
     /**
-     * @param Router     $owner
-     */
-    public function __construct(Router $owner)
-    {
-        $this->owner = $owner;
-    }
-
-    /**
-     * @var Router
-     */
-    private $owner;
-
-    /**
      * @var string route pattern
      */
     public $pattern;
@@ -48,26 +35,16 @@ class Route
     public $regexps = array();
 
     /**
-     * @var string|null route name (or NULL, if this is not a named route)
+     * @var Registry
      */
-    public $name;
+    protected $registry;
 
     /**
-     * @param string $name
-     *
-     * @return $this
+     * @param Registry $registry
      */
-    public function name($name)
+    public function __construct(Registry $registry)
     {
-        if ($this->name) {
-            throw new RuntimeException("route already has a name: {$name}");
-        }
-
-        $this->name = $name;
-
-        $this->owner->registerNamedRoute($this);
-
-        return $this;
+        $this->registry = $registry;
     }
 
     /**
@@ -101,8 +78,8 @@ class Route
                     if (isset($matches[2])) {
                         $pattern = $matches[2];
 
-                        if (isset($this->owner->symbols[$pattern])) {
-                            $symbol = $this->owner->symbols[$pattern];
+                        if (isset($this->registry->symbols[$pattern])) {
+                            $symbol = $this->registry->symbols[$pattern];
                             $pattern = $symbol->expression;
                         }
                     }
@@ -119,13 +96,13 @@ class Route
             if (strpos($part, '(?<') !== false) {
                 // pattern contains named parameter capture
                 if (!isset($current->regexps[$part])) {
-                    $current->regexps[$part] = new Route($this->owner);
+                    $current->regexps[$part] = new Route($this->registry);
                 }
                 $current = $current->regexps[$part];
             } else {
                 // pattern does not contain parameter capture
                 if (!isset($current->children[$part])) {
-                    $current->children[$part] = new Route($this->owner);
+                    $current->children[$part] = new Route($this->registry);
                 }
                 $current = $current->children[$part];
             }
@@ -135,6 +112,22 @@ class Route
         }
 
         return $current;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return $this
+     */
+    public function name($name)
+    {
+        if (isset($this->registry->routes[$name])) {
+            throw new RuntimeException("duplicate route name: {$name}");
+        }
+
+        $this->registry->routes[$name] = $this;
+
+        return $this;
     }
 
     /**

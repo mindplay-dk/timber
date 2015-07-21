@@ -20,42 +20,24 @@ class Router
     protected $root;
 
     /**
-     * @var Route[] map where route name => named Route instance
-     */
-    protected $named_routes = array();
-
-    /**
-     * Symbols provide a convenient short-hand syntax for placeholder tokens.
-     * The built-in standard symbols provide support for simplified named routes, such as:
-     *
-     * <pre>
-     *     'user/<user_id:int>'
-     *     'tags/<tag:slug>'
-     * </pre>
-     *
-     * For which the resulting patterns would be:
-     *
-     * <pre>
-     *     'user/(?<user_id:\d+>)'
-     *     'tags/(?<slug:[a-z0-9-]>)'
-     * </pre>
-     *
-     * @var Symbol[] map where symbol name => Symbol instance
-     */
-    public $symbols = array();
-
-    /**
      * @var int
      * @see sanitize()
      */
     protected $slug_max_length = 100;
 
     /**
+     * @var Registry name and Symbol registry
+     */
+    protected $registry;
+
+    /**
      * Initialize Router with default substitutions and symbols.
      */
     public function __construct()
     {
-        $this->root = new Route($this);
+        $this->registry = new Registry();
+
+        $this->root = new Route($this->registry);
 
         // define Symbols for the default pattern-substitution:
 
@@ -135,7 +117,7 @@ class Router
         $symbol->encode = $encode;
         $symbol->decode = $decode;
 
-        $this->symbols[$name] = $symbol;
+        $this->registry->symbols[$name] = $symbol;
     }
 
     /**
@@ -175,8 +157,8 @@ class Router
 
                             $symbol = $current->params[$name];
 
-                            $params[$name] = isset($this->symbols[$symbol]->decode)
-                                ? call_user_func($this->symbols[$symbol]->decode, $value)
+                            $params[$name] = isset($this->registry->symbols[$symbol]->decode)
+                                ? call_user_func($this->registry->symbols[$symbol]->decode, $value)
                                 : $value;
                         }
 
@@ -215,11 +197,11 @@ class Router
      */
     public function createUrl($name, $params = array())
     {
-        if (! isset($this->named_routes[$name])) {
+        if (! isset($this->registry->routes[$name])) {
             throw new InvalidArgumentException("no route with the given name has been defined: {$name}");
         }
 
-        $route = $this->named_routes[$name];
+        $route = $this->registry->routes[$name];
 
         return preg_replace_callback(
             self::PARAM_PATTERN,
@@ -229,8 +211,8 @@ class Router
                 if (isset($matches[2])) {
                     $pattern = $matches[2];
 
-                    if (isset($this->symbols[$pattern]->encode)) {
-                        return call_user_func($this->symbols[$pattern]->encode, $params[$name]);
+                    if (isset($this->registry->symbols[$pattern]->encode)) {
+                        return call_user_func($this->registry->symbols[$pattern]->encode, $params[$name]);
                     }
                 }
 
@@ -340,17 +322,5 @@ class Router
     public function setRoutes($routes)
     {
         $this->root = $routes;
-    }
-
-    /**
-     * @param Route $route
-     */
-    public function registerNamedRoute(Route $route)
-    {
-        if (isset($this->named_routes[$route->name])) {
-            throw new RuntimeException("duplicate route name: {$route->name}");
-        }
-
-        $this->named_routes[$route->name] = $route;
     }
 }
