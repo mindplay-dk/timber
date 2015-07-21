@@ -121,7 +121,7 @@ class Router
      *
      * @link https://github.com/vito/chyrp/blob/35c646dda657300b345a233ab10eaca7ccd4ec10/includes/helpers.php#L515
      */
-    function sanitize($string) {
+    protected function sanitize($string) {
         static $strip = array("~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]",
             "}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;",
             "—", "–", ",", "<", ".", ">", "/", "?");
