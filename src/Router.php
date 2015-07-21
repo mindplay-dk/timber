@@ -186,7 +186,7 @@ class Router
      * @throws RuntimeException if the regular expression fails to execute
      *
      * @see $substitutions
-     * @see addRoute()
+     * @see createRoute()
      */
     protected function preparePattern($pattern)
     {
@@ -261,15 +261,14 @@ class Router
     }
 
     /**
-     * @param string|string[] $methods HTTP request method (or list of methods)
+     * @param string $method HTTP request method
      * @param string $pattern
      * @param $handler
      *
      * @return Route the created Route object
      */
-    public function addRoute($methods, $pattern, $handler)
+    protected function createRoute($method, $pattern, $handler)
     {
-        $methods = (array) $methods;
         $pattern = $this->prefix . $pattern;
 
         $parts = explode('?', $pattern, 1);
@@ -329,10 +328,7 @@ class Router
         }
 
         $current->pattern = $pattern;
-
-        foreach ($methods as $method) {
-            $current->methods[strtoupper($method)] = $handler;
-        }
+        $current->methods[strtoupper($method)] = $handler;
 
         return $current;
     }
@@ -514,7 +510,7 @@ class Router
      */
     public function options($route, $handler)
     {
-        return $this->addRoute('OPTIONS', $route, $handler);
+        return $this->createRoute('OPTIONS', $route, $handler);
     }
 
     /**
@@ -525,7 +521,7 @@ class Router
      */
     public function get($route, $handler)
     {
-        return $this->addRoute('GET', $route, $handler);
+        return $this->createRoute('GET', $route, $handler);
     }
 
     /**
@@ -536,7 +532,7 @@ class Router
      */
     public function head($route, $handler)
     {
-        return $this->addRoute('HEAD', $route, $handler);
+        return $this->createRoute('HEAD', $route, $handler);
     }
 
     /**
@@ -547,7 +543,7 @@ class Router
      */
     public function post($route, $handler)
     {
-        return $this->addRoute('POST', $route, $handler);
+        return $this->createRoute('POST', $route, $handler);
     }
 
     /**
@@ -558,7 +554,7 @@ class Router
      */
     public function put($route, $handler)
     {
-        return $this->addRoute('PUT', $route, $handler);
+        return $this->createRoute('PUT', $route, $handler);
     }
 
     /**
@@ -569,7 +565,7 @@ class Router
      */
     public function delete($route, $handler)
     {
-        return $this->addRoute('DELETE', $route, $handler);
+        return $this->createRoute('DELETE', $route, $handler);
     }
 
     /**
@@ -580,7 +576,7 @@ class Router
      */
     public function trace($route, $handler)
     {
-        return $this->addRoute('TRACE', $route, $handler);
+        return $this->createRoute('TRACE', $route, $handler);
     }
 
     /**
@@ -591,6 +587,6 @@ class Router
      */
     public function connect($route, $handler)
     {
-        return $this->addRoute('CONNECT', $route, $handler);
+        return $this->createRoute('CONNECT', $route, $handler);
     }
 }

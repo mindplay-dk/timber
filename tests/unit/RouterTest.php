@@ -42,7 +42,7 @@ class RouterTest extends \Codeception\TestCase\Test
     {
         $router = new \TreeRoute\Router();
 
-        $router->addRoute(['GET'], '/', 'handler0');
+        $router->get('/', 'handler0');
 
         $this->specify('should find existed route', function () use ($router) {
             $result = $router->resolve('GET', '/');
