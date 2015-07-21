@@ -25,25 +25,8 @@ class Router
     protected $named_routes = array();
 
     /**
-     * A map of regular expression pattern substitutions to apply to every
-     * pattern encountered, as a means fo pre-processing patterns. Provides a
-     * useful means of adding your own custom patterns for convenient reuse.
-     *
-     * @var callable[] map where full regular expression => substitution closure
-     */
-    protected $substitutions = array();
-
-    /**
-     * Symbols used by the built-in standard substitution pattern, which provides
-     * a convenient short-hand syntax for placeholder tokens. The built-in standard
-     * symbols are:
-     *
-     * <pre>
-     *     'int'  => '\d+'
-     *     'slug' => '[a-z0-9-]+'
-     * </pre>
-     *
-     * Which provides support for simplified named routes, such as:
+     * Symbols provide a convenient short-hand syntax for placeholder tokens.
+     * The built-in standard symbols provide support for simplified named routes, such as:
      *
      * <pre>
      *     'user/<user_id:int>'
@@ -138,21 +121,6 @@ class Router
     }
 
     /**
-     * Define a substitution pattern used to preprocess route patterns
-     *
-     * @param string  $pattern regular expression pattern
-     * @param Closure $func    replacement callback: `function (string[] $matches) : string`
-     *
-     * @return void
-     *
-     * @see
-     */
-    public function defineSubstitution($pattern, $func)
-    {
-        $this->substitutions[$pattern] = $func;
-    }
-
-    /**
      * Define a symbol name for use in parameter definitions in route patterns
      *
      * @param string        $name       symbol name
@@ -174,31 +142,6 @@ class Router
         $symbol->decode = $decode;
 
         $this->symbols[$name] = $symbol;
-    }
-
-    /**
-     * Prepares a regular expression pattern by applying substitution patterns to it.
-     *
-     * @param string $pattern unprocessed pattern
-     *
-     * @return string pre-processed pattern
-     *
-     * @throws RuntimeException if the regular expression fails to execute
-     *
-     * @see $substitutions
-     * @see createRoute()
-     */
-    protected function preparePattern($pattern)
-    {
-        foreach ($this->substitutions as $subpattern => $fn) {
-            $pattern = @preg_replace_callback($subpattern, $fn, $pattern);
-
-            if ($pattern === null) {
-                throw new RuntimeException("invalid substitution pattern: {$subpattern}");
-            }
-        }
-
-        return $pattern;
     }
 
     /**
@@ -279,11 +222,9 @@ class Router
         $current = $this->root;
 
         foreach ($parts as $part) {
-            $part_pattern = $this->preparePattern($part);
-
             $params = array();
 
-            $part_pattern = preg_replace_callback(
+            $part = preg_replace_callback(
                 self::PARAM_PATTERN,
                 function ($matches) use (&$params) {
                     $name = $matches[1];
@@ -305,15 +246,15 @@ class Router
 
                     return "(?<{$name}>{$pattern})";
                 },
-                $part_pattern
+                $part
             );
 
-            if (strpos($part_pattern, '(?<') !== false) {
+            if (strpos($part, '(?<') !== false) {
                 // pattern contains named parameter capture
-                if (!isset($current->regexps[$part_pattern])) {
-                    $current->regexps[$part_pattern] = new Route($this);
+                if (!isset($current->regexps[$part])) {
+                    $current->regexps[$part] = new Route($this);
                 }
-                $current = $current->regexps[$part_pattern];
+                $current = $current->regexps[$part];
             } else {
                 // pattern does not contain parameter capture
                 if (!isset($current->children[$part])) {
@@ -344,8 +285,6 @@ class Router
 
         $route = $this->named_routes[$name];
 
-        $pattern = $this->preparePattern($route->pattern);
-
         return preg_replace_callback(
             self::PARAM_PATTERN,
             function ($matches) use ($params) {
@@ -361,7 +300,7 @@ class Router
 
                 return $params[$name];
             },
-            $pattern
+            $route->pattern
         );
     }
 
