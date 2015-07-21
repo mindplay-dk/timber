@@ -15,9 +15,9 @@ class Router
     const SEPARATOR_PATTERN = '/^[\s\/]+|[\s\/]+$/';
 
     /**
-     * @var Route
+     * @var Route root Route (e.g. corresponding to "/")
      */
-    protected $routes;
+    protected $root;
 
     /**
      * @var Route[] map where route name => named Route instance
@@ -78,7 +78,7 @@ class Router
      */
     public function __construct()
     {
-        $this->routes = new Route($this);
+        $this->root = new Route($this);
 
         // define Symbols for the default pattern-substitution:
 
@@ -214,7 +214,7 @@ class Router
             $parts = [];
         }
         $params = [];
-        $current = $this->routes;
+        $current = $this->root;
 
         foreach ($parts as $part) {
             if (isset($current->children[$part])) {
@@ -279,7 +279,7 @@ class Router
             $parts = [];
         }
 
-        $current = $this->routes;
+        $current = $this->root;
 
         foreach ($parts as $part) {
             $part_pattern = $this->preparePattern($part);
@@ -483,7 +483,7 @@ class Router
      */
     public function getRoutes()
     {
-        return $this->routes;
+        return $this->root;
     }
 
     /**
@@ -491,7 +491,7 @@ class Router
      */
     public function setRoutes($routes)
     {
-        $this->routes = $routes;
+        $this->root = $routes;
     }
 
     /**
