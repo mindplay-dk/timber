@@ -35,7 +35,7 @@ class Route
     /**
      * @var callable[] map where HTTP method => callable method handler
      */
-    public $methods = array();
+    public $handlers = array();
 
     /**
      * @var Route[] list of nested Route instances
@@ -66,6 +66,102 @@ class Route
         $this->name = $name;
 
         $this->owner->registerNamedRoute($this);
+
+        return $this;
+    }
+
+    /**
+     * @param callable $handler
+     *
+     * @return $this
+     */
+    public function options($handler)
+    {
+        $this->handlers['OPTIONS'] = $handler;
+
+        return $this;
+    }
+
+    /**
+     * @param callable $handler
+     *
+     * @return $this
+     */
+    public function get($handler)
+    {
+        $this->handlers['GET'] = $handler;
+
+        return $this;
+    }
+
+    /**
+     * @param callable $handler
+     *
+     * @return $this
+     */
+    public function head($handler)
+    {
+        $this->handlers['HEAD'] = $handler;
+
+        return $this;
+    }
+
+    /**
+     * @param callable $handler
+     *
+     * @return $this
+     */
+    public function post($handler)
+    {
+        $this->handlers['POST'] = $handler;
+
+        return $this;
+    }
+
+    /**
+     * @param callable $handler
+     *
+     * @return $this
+     */
+    public function put($handler)
+    {
+        $this->handlers['PUT'] = $handler;
+
+        return $this;
+    }
+
+    /**
+     * @param callable $handler
+     *
+     * @return $this
+     */
+    public function delete($handler)
+    {
+        $this->handlers['DELETE'] = $handler;
+
+        return $this;
+    }
+
+    /**
+     * @param callable $handler
+     *
+     * @return $this
+     */
+    public function trace($handler)
+    {
+        $this->handlers['TRACE'] = $handler;
+
+        return $this;
+    }
+
+    /**
+     * @param callable $handler
+     *
+     * @return $this
+     */
+    public function connect($handler)
+    {
+        $this->handlers['CONNECT'] = $handler;
 
         return $this;
     }

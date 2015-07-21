@@ -42,7 +42,7 @@ class RouterTest extends \Codeception\TestCase\Test
     {
         $router = new \TreeRoute\Router();
 
-        $router->get('/', 'handler0');
+        $router->route('/')->get('handler0');
 
         $this->specify('should find existed route', function () use ($router) {
             $result = $router->resolve('GET', '/');
@@ -62,14 +62,14 @@ class RouterTest extends \Codeception\TestCase\Test
         });
 
         $this->specify('should define route with short methods', function () use ($router) {
-            $router->post('/create', 'handler1');
+            $router->route('/create')->post('handler1');
             $result = $router->resolve('POST', '/create');
 
             $this->assertEquals('handler1', $result->handler);
         });
 
         $this->specify('should extract route params', function () use ($router) {
-            $router->get('/news/<id:int>', 'handler2');
+            $router->route('/news/<id:int>')->get('handler2');
             $result = $router->resolve('GET', '/news/1');
             $this->assertResultIsSuccess($result);
             $this->assertEquals('handler2', $result->handler);
@@ -81,8 +81,8 @@ class RouterTest extends \Codeception\TestCase\Test
         });
 
         $this->specify('should match regexp in params', function () use ($router) {
-            $router->get('/users/<name:^[a-zA-Z]+$>', 'handler3');
-            $router->get('/users/<id:int>', 'handler4');
+            $router->route('/users/<name:^[a-zA-Z]+$>')->get('handler3');
+            $router->route('/users/<id:int>')->get('handler4');
 
             $result = $router->resolve('GET', '/users/@test');
             $this->assertResultIsError($result, 404);
@@ -97,7 +97,7 @@ class RouterTest extends \Codeception\TestCase\Test
         });
 
         $this->specify('should give greater priority to statically defined route', function () use ($router) {
-            $router->get('/users/help', 'handler5');
+            $router->route('/users/help')->get('handler5');
             $result = $router->resolve('GET', '/users/help');
             $this->assertEquals('handler5', $result->handler);
             $this->assertEmpty($result->params);
@@ -114,7 +114,7 @@ class RouterTest extends \Codeception\TestCase\Test
         });
 
         $this->specify('should handle pattern substitutions', function () use ($router) {
-            $router->get('/year/<year:int>', 'year');
+            $router->route('/year/<year:int>')->get('year');
 
             $result = $router->resolve('GET', '/year/2020');
             $this->assertEquals('year', $result->handler);
@@ -122,7 +122,7 @@ class RouterTest extends \Codeception\TestCase\Test
         });
 
         $this->specify('should match multiple params in one part', function () use ($router) {
-            $router->get('/archive-<year:int>-<month:int>-<day:int>', 'archive');
+            $router->route('/archive-<year:int>-<month:int>-<day:int>')->get('archive');
             $result = $router->resolve('GET', '/archive-2015-31-01');
             $this->assertEquals('archive', $result->handler);
             $this->assertEquals(2015, $result->params['year']);
@@ -134,10 +134,10 @@ class RouterTest extends \Codeception\TestCase\Test
             $router = new \TreeRoute\Router();
             $router->with('/admin', function () use ($router) {
                 $router->with('/menu', function () use ($router) {
-                    $router->get('/load', 'load');
-                    $router->get('/save', 'save');
+                    $router->route('/load')->get('load');
+                    $router->route('/save')->get('save');
                 });
-                $router->post('/upload', 'upload');
+                $router->route('/upload')->post('upload');
             });
             $this->assertEquals('load', $router->resolve('GET', '/admin/menu/load')->handler);
             $this->assertEquals('save', $router->resolve('GET', '/admin/menu/save')->handler);
@@ -146,7 +146,7 @@ class RouterTest extends \Codeception\TestCase\Test
 
         $this->specify('should dispatch handlers with parameters', function () {
             $router = new \TreeRoute\Router();
-            $router->get('/content/<id:int>-<title:slug>', function ($id, $title) {
+            $router->route('/content/<id:int>-<title:slug>')->get(function ($id, $title) {
                 return array($id, $title);
             });
             $result = $router->dispatch('GET', '/content/123-hello-world');
@@ -155,7 +155,7 @@ class RouterTest extends \Codeception\TestCase\Test
 
         $this->specify('can create named routes', function () {
             $router = new \TreeRoute\Router();
-            $router->get('/content/<id:int>/<title:slug>', 'handler')->name('content');
+            $router->route('/content/<id:int>/<title:slug>')->get('handler')->name('content');
             $this->assertEquals('/content/123/hello-world', $router->createUrl('content', ['id' => 123, 'title' => 'Hello, World!']));
         });
     }

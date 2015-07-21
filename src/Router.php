@@ -250,7 +250,7 @@ class Router
             }
         }
 
-        if (!isset($current->methods)) {
+        if (!isset($current->handlers)) {
             return null;
         } else {
             return new Match(
@@ -261,13 +261,11 @@ class Router
     }
 
     /**
-     * @param string $method HTTP request method
      * @param string $pattern
-     * @param $handler
      *
      * @return Route the created Route object
      */
-    protected function createRoute($method, $pattern, $handler)
+    public function route($pattern)
     {
         $pattern = $this->prefix . $pattern;
 
@@ -328,7 +326,6 @@ class Router
         }
 
         $current->pattern = $pattern;
-        $current->methods[strtoupper($method)] = $handler;
 
         return $current;
     }
@@ -400,7 +397,7 @@ class Router
         if (!$match) {
             return null;
         } else {
-            return array_keys($match->route->methods);
+            return array_keys($match->route->handlers);
         }
     }
 
@@ -424,11 +421,11 @@ class Router
             $result->route = $match->route;
             $result->params = $match->params;
 
-            if (isset($match->route->methods[$method])) {
-                $result->handler = $match->route->methods[$method];
+            if (isset($match->route->handlers[$method])) {
+                $result->handler = $match->route->handlers[$method];
             } else {
                 $result->error = new Error(405, 'Method Not Allowed');
-                $result->error->allowed = array_keys($match->route->methods);
+                $result->error->allowed = array_keys($match->route->handlers);
             }
         }
 
@@ -500,93 +497,5 @@ class Router
         }
 
         $this->named_routes[$route->name] = $route;
-    }
-
-    /**
-     * @param string $route
-     * @param callable $handler
-     *
-     * @return Route
-     */
-    public function options($route, $handler)
-    {
-        return $this->createRoute('OPTIONS', $route, $handler);
-    }
-
-    /**
-     * @param string $route
-     * @param callable $handler
-     *
-     * @return Route
-     */
-    public function get($route, $handler)
-    {
-        return $this->createRoute('GET', $route, $handler);
-    }
-
-    /**
-     * @param string $route
-     * @param callable $handler
-     *
-     * @return Route
-     */
-    public function head($route, $handler)
-    {
-        return $this->createRoute('HEAD', $route, $handler);
-    }
-
-    /**
-     * @param string $route
-     * @param callable $handler
-     *
-     * @return Route
-     */
-    public function post($route, $handler)
-    {
-        return $this->createRoute('POST', $route, $handler);
-    }
-
-    /**
-     * @param string $route
-     * @param callable $handler
-     *
-     * @return Route
-     */
-    public function put($route, $handler)
-    {
-        return $this->createRoute('PUT', $route, $handler);
-    }
-
-    /**
-     * @param string $route
-     * @param callable $handler
-     *
-     * @return Route
-     */
-    public function delete($route, $handler)
-    {
-        return $this->createRoute('DELETE', $route, $handler);
-    }
-
-    /**
-     * @param string $route
-     * @param callable $handler
-     *
-     * @return Route
-     */
-    public function trace($route, $handler)
-    {
-        return $this->createRoute('TRACE', $route, $handler);
-    }
-
-    /**
-     * @param string $route
-     * @param callable $handler
-     *
-     * @return Route
-     */
-    public function connect($route, $handler)
-    {
-        return $this->createRoute('CONNECT', $route, $handler);
     }
 }
