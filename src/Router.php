@@ -42,19 +42,13 @@ class Router
      *
      * @var Symbol[] map where symbol name => Symbol instance
      */
-    protected $symbols = array();
+    public $symbols = array();
 
     /**
      * @var int
      * @see sanitize()
      */
     protected $slug_max_length = 100;
-
-    /**
-     * @var string temporary route prefix
-     * @see with()
-     */
-    private $prefix;
 
     /**
      * Initialize Router with default substitutions and symbols.
@@ -210,65 +204,7 @@ class Router
      */
     public function route($pattern)
     {
-        $pattern = $this->prefix . $pattern;
-
-        $parts = explode('?', $pattern, 1);
-        $parts = explode('/', preg_replace(self::SEPARATOR_PATTERN, '', $parts[0]));
-
-        if (sizeof($parts) === 1 && $parts[0] === '') {
-            $parts = [];
-        }
-
-        $current = $this->root;
-
-        foreach ($parts as $part) {
-            $params = array();
-
-            $part = preg_replace_callback(
-                self::PARAM_PATTERN,
-                function ($matches) use (&$params) {
-                    $name = $matches[1];
-                    $pattern = '[^\/]+';
-                    $symbol = null;
-
-                    if (isset($matches[2])) {
-                        $pattern = $matches[2];
-
-                        if (isset($this->symbols[$pattern])) {
-                            $symbol = $this->symbols[$pattern];
-                            $pattern = $symbol->expression;
-                        }
-                    }
-
-                    $params[$name] = $symbol
-                        ? $symbol->name
-                        : $pattern;
-
-                    return "(?<{$name}>{$pattern})";
-                },
-                $part
-            );
-
-            if (strpos($part, '(?<') !== false) {
-                // pattern contains named parameter capture
-                if (!isset($current->regexps[$part])) {
-                    $current->regexps[$part] = new Route($this);
-                }
-                $current = $current->regexps[$part];
-            } else {
-                // pattern does not contain parameter capture
-                if (!isset($current->children[$part])) {
-                    $current->children[$part] = new Route($this);
-                }
-                $current = $current->children[$part];
-            }
-
-            $current->params = $params;
-        }
-
-        $current->pattern = $pattern;
-
-        return $current;
+        return $this->root->route($pattern);
     }
 
     /**
@@ -302,26 +238,6 @@ class Router
             },
             $route->pattern
         );
-    }
-
-    /**
-     * Configure the Router with a given route prefix, which will be
-     * applied to all the routes created in the given callback.
-     *
-     * @param string $prefix
-     * @param callable $func function (Router $router) : void
-     *
-     * @return void
-     */
-    public function with($prefix, callable $func)
-    {
-        $saved = $this->prefix;
-
-        $this->prefix .= $prefix;
-
-        $func($this);
-
-        $this->prefix = $saved;
     }
 
     /**

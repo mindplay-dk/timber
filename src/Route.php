@@ -71,6 +71,73 @@ class Route
     }
 
     /**
+     * @param string $pattern
+     *
+     * @return Route the created Route object
+     */
+    public function route($pattern)
+    {
+        $parts = explode('?', $pattern, 1);
+        $parts = explode('/', preg_replace(Router::SEPARATOR_PATTERN, '', $parts[0]));
+
+        if (sizeof($parts) === 1 && $parts[0] === '') {
+            $parts = [];
+        }
+
+        $current = $this;
+        $pattern = $this->pattern;
+
+        foreach ($parts as $part) {
+            $pattern .= '/' . $part;
+            $params = array();
+
+            $part = preg_replace_callback(
+                Router::PARAM_PATTERN,
+                function ($matches) use (&$params) {
+                    $name = $matches[1];
+                    $pattern = '[^\/]+';
+                    $symbol = null;
+
+                    if (isset($matches[2])) {
+                        $pattern = $matches[2];
+
+                        if (isset($this->owner->symbols[$pattern])) {
+                            $symbol = $this->owner->symbols[$pattern];
+                            $pattern = $symbol->expression;
+                        }
+                    }
+
+                    $params[$name] = $symbol
+                        ? $symbol->name
+                        : $pattern;
+
+                    return "(?<{$name}>{$pattern})";
+                },
+                $part
+            );
+
+            if (strpos($part, '(?<') !== false) {
+                // pattern contains named parameter capture
+                if (!isset($current->regexps[$part])) {
+                    $current->regexps[$part] = new Route($this->owner);
+                }
+                $current = $current->regexps[$part];
+            } else {
+                // pattern does not contain parameter capture
+                if (!isset($current->children[$part])) {
+                    $current->children[$part] = new Route($this->owner);
+                }
+                $current = $current->children[$part];
+            }
+
+            $current->params = $params;
+            $current->pattern = $pattern;
+        }
+
+        return $current;
+    }
+
+    /**
      * @param callable $handler
      *
      * @return $this
