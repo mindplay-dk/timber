@@ -39,7 +39,7 @@ $router->route('/news/<slug:slug>')->get('handler3');
 $router->route('/news/all')->get('handler4');
 
 // Defining another route
-$router->get('/news')->get('handler5');
+$router->route('/news')->get('handler5');
 
 $method = 'GET';
 
