@@ -26,11 +26,11 @@ $router->route('/news')->get('handler0');
 // Defining route for several HTTP methods
 $router->route('/')->get('get_handler1')->post('post_handler1');
 
-// Defining named route with regular expression param
-$router->route('/news/<id:^[0-9]+$>')->get('handler2')->name('show_news');
+// Defining a route with regular expression param and keeping a reference to the Route object
+$news_route = $router->route('/news/<id:^[0-9]+$>')->get('handler2')->name('show_news');
 
 // Creating a URL using the "show_news" named route:
-var_dump($router->createUrl('show_news', ['id' => 123])); // => "/news/123"
+var_dump($news_routes->url(['id' => 123])); // => "/news/123"
 
 // Defining another route with symbolic param
 $router->route('/news/<slug:slug>')->get('handler3');
