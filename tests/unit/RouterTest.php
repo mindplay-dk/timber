@@ -19,7 +19,7 @@ class RouterTest extends \Codeception\TestCase\Test
 
     /**
      * @param \TreeRoute\Result $result
-     * @param int               $code
+     * @param int $code
      */
     private function assertResultIsError(\TreeRoute\Result $result, $code)
     {
@@ -36,6 +36,33 @@ class RouterTest extends \Codeception\TestCase\Test
     private function assertResultIsSuccess(\TreeRoute\Result $result)
     {
         $this->assertEmpty($result->error);
+    }
+
+    /**
+     * @param string $type
+     * @param string|null $message
+     * @param callable $function
+     */
+    protected function assertException($type, $message, callable $function)
+    {
+        $thrown = false;
+        $reason = 'no exception thrown';
+
+        try {
+            call_user_func($function);
+        } catch (Exception $e) {
+            if ($e instanceof $type) {
+                if ($message === null || strcasecmp($message, $e->getMessage()) === 0) {
+                    $thrown = true;
+                } else {
+                    $reason = "unexpected message: \"{$e->getMessage()}\", expected: \"{$message}\"";
+                }
+            } else {
+                $reason = "unexpected type: " . get_class($e);
+            }
+        }
+
+        $this->assertTrue($thrown, "Expected exception: {$type}" . ($reason ? " ({$reason})" : ""));
     }
 
     public function testRouter()
@@ -163,10 +190,14 @@ class RouterTest extends \Codeception\TestCase\Test
             $this->assertEquals(array('123', 'hello-world'), $result);
         });
 
-        $this->specify('can create named routes', function () {
+        $this->specify('can create URL', function () {
             $router = new \TreeRoute\Router();
-            $router->route('content/<id:int>/<title:slug>')->get('handler')->name('content');
-            $this->assertEquals('/content/123/hello-world', $router->createUrl('content', ['id' => 123, 'title' => 'Hello, World!']));
+            $route = $router->route('content/<id:int>/<title:slug>');
+            $this->assertEquals('/content/123/hello-world', $route->url(['id' => 123, 'title' => 'Hello, World!']));
+
+            $this->assertException(UnexpectedValueException::class, 'unexpected type: array', function () use ($route) {
+                $route->url(['id' => array(), 'title' => 'Oops']); // will throw because of type violation
+            });
         });
     }
 }

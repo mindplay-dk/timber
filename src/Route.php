@@ -2,8 +2,6 @@
 
 namespace TreeRoute;
 
-use RuntimeException;
-
 /**
  * This class represents a route, or part of a route, within a Router.
  */
@@ -115,19 +113,29 @@ class Route
     }
 
     /**
-     * @param string $name
+     * @param array $params
      *
-     * @return $this
+     * @return string
      */
-    public function name($name)
+    public function url($params = array())
     {
-        if (isset($this->registry->routes[$name])) {
-            throw new RuntimeException("duplicate route name: {$name}");
-        }
+        return preg_replace_callback(
+            Router::PARAM_PATTERN,
+            function ($matches) use ($params) {
+                $name = $matches[1];
 
-        $this->registry->routes[$name] = $this;
+                if (isset($matches[2])) {
+                    $pattern = $matches[2];
 
-        return $this;
+                    if (isset($this->registry->symbols[$pattern]->encode)) {
+                        return call_user_func($this->registry->symbols[$pattern]->encode, $params[$name]);
+                    }
+                }
+
+                return $params[$name];
+            },
+            $this->pattern
+        );
     }
 
     /**

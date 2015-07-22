@@ -3,7 +3,6 @@
 namespace TreeRoute;
 
 use Closure;
-use InvalidArgumentException;
 use ReflectionFunction;
 use ReflectionMethod;
 use RuntimeException;
@@ -45,10 +44,17 @@ class Router
             'int',
             '\d+',
             function ($value) {
-                $value = strval($value);
+                if (is_scalar($value)) {
+                    $value = (string) $value;
+                } elseif (is_callable(array($value, '__toString'))) {
+                    /** @noinspection PhpUndefinedMethodInspection */
+                    $value = $value->__toString();
+                } else {
+                    throw new UnexpectedValueException("unexpected type: " . gettype($value));
+                }
 
                 if (!ctype_digit($value)) {
-                    throw new UnexpectedValueException("invalid symbol value: " . $value);
+                    throw new UnexpectedValueException("unexpected value: " . $value);
                 }
 
                 return $value;
@@ -187,39 +193,6 @@ class Router
     public function route($pattern)
     {
         return $this->root->route($pattern);
-    }
-
-    /**
-     * @param string $name route name
-     * @param array $params
-     *
-     * @return string
-     */
-    public function createUrl($name, $params = array())
-    {
-        if (! isset($this->registry->routes[$name])) {
-            throw new InvalidArgumentException("no route with the given name has been defined: {$name}");
-        }
-
-        $route = $this->registry->routes[$name];
-
-        return preg_replace_callback(
-            self::PARAM_PATTERN,
-            function ($matches) use ($params) {
-                $name = $matches[1];
-
-                if (isset($matches[2])) {
-                    $pattern = $matches[2];
-
-                    if (isset($this->registry->symbols[$pattern]->encode)) {
-                        return call_user_func($this->registry->symbols[$pattern]->encode, $params[$name]);
-                    }
-                }
-
-                return $params[$name];
-            },
-            $route->pattern
-        );
     }
 
     /**

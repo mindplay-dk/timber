@@ -26,9 +26,4 @@ class Registry
      * @var Symbol[] map where symbol name => Symbol instance
      */
     public $symbols = array();
-
-    /**
-     * @var Route[] map where route name => named Route instance
-     */
-    public $routes = array();
 }
