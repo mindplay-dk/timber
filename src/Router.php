@@ -10,6 +10,42 @@ use UnexpectedValueException;
 
 class Router
 {
+    // TODO we're faced with a trade-off here.
+    //
+    // We need to decide between one of the following:
+    //
+    // 1. Handlers are currently callable - in the original TreeRoute they were
+    //    just strings, requiring a convention and syntax of some sort, in order
+    //    to dispatch a handler, e.g. "controller::action" syntax, something the
+    //    original library didn't deal with. The issue here is with caching - a
+    //    closure cannot be serialized, thus getRoutes() and setRoutes() are
+    //    currently useless. We would need to return to handlers being just
+    //    strings, in order to support caching by getting and setting routes.
+    //
+    // 2. Retain support for callable handlers, meaning, accept the fact that we
+    //    cannot support getRoutes() and setRoutes() and that the resulting
+    //    routes cannot be cached.
+    //
+    // 3. Drop support for URL creation and accept the fact that URL creation
+    //    needs to happen in URL creation functions somewhere else, outside
+    //    the scope of the router. This would simplify things, but it does
+    //    mean that you will need to manually keep your URL creation
+    //    functions in sync with your route definitions - maintaining code to
+    //    ensure the URL creation functions create URLs that are valid for the
+    //    route definitions.
+    //
+    // In the case of (1) we will be introducing a fair bit of new complexity,
+    // in the form of a convention/syntax for the handler string format, but
+    // also, we would need to reintroduce named routes, in order to support
+    // URL creation - because you would not be calling the code that creates
+    // the routes, obtaining a reference to routes at creation time cannot
+    // happen, hence names (and probably namespaces) need to be introduced in
+    // order to obtain route references from the Router, at any time, by name.
+    //
+    // There is no "best of both worlds" here - we either forego caching, or
+    // we reintroduce named routes and namespaces, or we drop support for
+    // named routes and URL creation altogether.
+
     const PARAM_PATTERN = '/(?<!\(\?)<([^\:]+)(?:$|\:([^>]+)|)>/';
     const SEPARATOR_PATTERN = '/^[\s\/]+|[\s\/]+$/';
 
