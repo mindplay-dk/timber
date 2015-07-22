@@ -132,12 +132,21 @@ class RouterTest extends \Codeception\TestCase\Test
 
         $this->specify('can build routes progressively', function () {
             $router = new \TreeRoute\Router();
+
+            // using statement-groups to clarify the created structure:
+
             $admin = $router->route('admin');
-            $upload = $admin->route('upload')->post('upload');
+            {
+                $upload = $admin->route('upload')->post('upload');
+
+                $menu = $admin->route('menu');
+                {
+                    $menu->route('load')->get('load');
+                    $menu->route('save')->get('save');
+                }
+            }
+
             $this->assertEquals('/admin/upload', $upload->pattern);
-            $menu = $admin->route('menu');
-            $menu->route('load')->get('load');
-            $menu->route('save')->get('save');
             $this->assertEquals($menu->route('load'), $router->route('admin/menu/load'));
             $this->assertEquals('load', $router->resolve('GET', '/admin/menu/load')->handler);
             $this->assertEquals('save', $router->resolve('GET', '/admin/menu/save')->handler);
