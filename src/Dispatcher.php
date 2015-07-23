@@ -99,7 +99,7 @@ class Dispatcher
      *
      * @return mixed|Error return value from the dispatched handler (or an instance of Error)
      */
-    public function dispatch($method, $url, $vars = array())
+    public function run($method, $url, $vars = array())
     {
         $result = $this->router->resolve($method, $url);
 

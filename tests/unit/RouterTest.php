@@ -212,7 +212,7 @@ class RouterTest extends \Codeception\TestCase\Test
 
             $dispatcher = new Dispatcher($router);
 
-            $result = $dispatcher->dispatch('GET', '/content/123-hello-world');
+            $result = $dispatcher->run('GET', '/content/123-hello-world');
             $this->assertEquals(array('123', 'hello-world'), $result);
         });
 
