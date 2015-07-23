@@ -2,9 +2,6 @@
 
 namespace TreeRoute;
 
-use Closure;
-use ReflectionFunction;
-use ReflectionMethod;
 use RuntimeException;
 use UnexpectedValueException;
 
@@ -179,45 +176,6 @@ class Router
         }
 
         return $result;
-    }
-
-    /**
-     * @param string $method HTTP method name
-     * @param string $url
-     *
-     * @return mixed|Error return value from the dispatched handler (or an instance of Error)
-     */
-    public function dispatch($method, $url)
-    {
-        $result = $this->resolve($method, $url);
-
-        if ($result->error) {
-            return $result->error;
-        }
-
-        if ($result->handler instanceof Closure) {
-            $reflection = new ReflectionFunction($result->handler);
-        } elseif (is_array($result->handler)) {
-            $reflection = new ReflectionMethod($result->handler[0], $result->handler[1]);
-        }
-
-        $params = array();
-
-        if (isset($reflection)) {
-            foreach ($reflection->getParameters() as $param) {
-                $name = $param->getName();
-
-                if (isset($result->params[$name])) {
-                    $params[$name] = $result->params[$name];
-                } elseif ($param->isOptional()) {
-                    $params[$name] = $param->getDefaultValue();
-                } else {
-                    throw new RuntimeException("unable to dispatch handler - missing parameter: {$name}");
-                }
-            }
-        }
-
-        return call_user_func_array($result->handler, $params);
     }
 
     /**

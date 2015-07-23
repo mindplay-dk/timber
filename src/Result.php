@@ -30,7 +30,7 @@ class Result
     public $params = array();
 
     /**
-     * @var callable
+     * @var string|null handler defined for the attempted HTTP method (or NULL, if this Result is an error)
      */
     public $handler;
 

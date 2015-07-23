@@ -3,51 +3,43 @@ TreeRoute - request router
 
 TreeRoute is a performance focused request router with regular expressions support.
 
+
 Installation
 -----------
 
 Install the latest version with `composer require baryshev/tree-route`
+
 
 Usage
 -----
 
 Basic usage:
 
-```php
-<?php
+```PHP
+use TreeRoute\Router;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$router = new \TreeRoute\Router();
+$router = new Router();
 
 // Defining route for one HTTP method
-$router->route('/news')->get('handler0');
+$router->route('/news')->get(ListNews::class);
 
 // Defining route for several HTTP methods
-$router->route('/')->get('get_handler1')->post('post_handler1');
+$router->route('/')->get(ShowHomePage::class)->post(PostComments::class);
 
-// Defining a route with regular expression param and keeping a reference to the Route object
-$news_route = $router->route('/news/<id:^[0-9]+$>')->get('handler2')->name('show_news');
-
-// Creating a URL using the "show_news" named route:
-var_dump($news_route->url(['id' => 123])); // => "/news/123"
+// Defining a route with regular expression param
+$news_route = $router->route('/news/<id:^[0-9]+$>')->get(ShowNews::class);
 
 // Defining another route with symbolic param
-$router->route('/news/<slug:slug>')->get('handler3');
+$router->route('/users/<username:slug>')->get(ShowUser::class);
 
 // Defining static route that conflicts with previous route, but static routes have high priority
-$router->route('/news/all')->get('handler4');
+$router->route('/news/all')->get(ShowAllNews::class);
 
-// Defining another route
-$router->route('/news')->get('handler5');
+// Resolve HTTP method and URL:
 
 $method = 'GET';
-
-// Optionally pass HEAD requests to GET handlers
-// if ($method == 'HEAD') {
-//    $method = 'GET';
-// }
-
 $url = '/news/1';
 
 $result = $router->resolve($method, $url);
@@ -72,32 +64,69 @@ if (!$result->error) {
 }
 ```
 
-Save and restore routes (useful for routes caching):
+We also provide a [Dispatcher](src/Dispatcher.php) class and [Controller](src/Controller.php)
+interface, following a simple convention of handler names being class-names, and a
+class-per-action strategy:
+
+```PHP
+use TreeRoute\Router;
+use TreeRoute\Controller;
+use TreeRoute\Dispatcher;
+
+class ShowNews implements Controller
+{
+    public function run($id) {
+        // load and display news article...
+    }
+}
+
+$router = new Router();
+$router->route('/news/<id:int>', ShowNews::class);
+
+$dispatcher = new Dispatcher($router);
+
+$dispatcher->dispatch('GET', '/news');
+```
+
+The named parameter in this example will be converted to an integer and provided
+to the `run()` method.
+
+In addition, we provide a [base class for URL creation helpers](src/UrlHelper.php) -
+this has no direct relationship with the router as such, it's provided for
+convenience, to support our overall strategy of creating testable URL helpers.
+
+
+Optimization
+------------
+
+You can save and restore the defined routes:
 
 ```php
-<?php
+use TreeRoute\Router;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$router = new \TreeRoute\Router();
-$router->addRoute(['GET', 'POST'], '/', 'handler0');
-$router->addRoute('GET', '/news', 'handler1');
+$router = new Router();
+$router->route('/')->get(ShowHomePage::class);
+$router->route('/news')->get(ShowNews::class);
 
 $routes = $router->getRoutes();
 
-$anotherRouter = new \TreeRoute\Router();
+$anotherRouter = new Router();
 $anotherRouter->setRoutes($routes);
 
 $method = 'GET';
 $url = '/news';
 
-$result = $anotherRouter->dispatch($method, $url);
+$result = $anotherRouter->resolve($method, $url);
 ```
 
-Benchmark
----------
+The point is, you can serialize/unserialize the routes that have been built, and
+store them in a cache somewhere, to avoid the initialization overhead. For most
+projects, this would be considered a micro-optimization - the overhead of building
+an extremely high number of routes (hundreds or thousands) may make this worthwhile
+in a very large modular project.
 
-https://github.com/baryshev/FastRoute-vs-TreeRoute
 
 Design Notes
 ------------

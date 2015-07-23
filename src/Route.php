@@ -18,7 +18,7 @@ class Route
     public $params;
 
     /**
-     * @var callable[] map where HTTP method => callable method handler
+     * @var string[] map where HTTP method => handler name
      */
     public $handlers = array();
 
@@ -113,7 +113,7 @@ class Route
     }
 
     /**
-     * @param callable $handler
+     * @param string $handler
      *
      * @return $this
      */
@@ -125,7 +125,7 @@ class Route
     }
 
     /**
-     * @param callable $handler
+     * @param string $handler
      *
      * @return $this
      */
@@ -137,7 +137,7 @@ class Route
     }
 
     /**
-     * @param callable $handler
+     * @param string $handler
      *
      * @return $this
      */
@@ -149,7 +149,7 @@ class Route
     }
 
     /**
-     * @param callable $handler
+     * @param string $handler
      *
      * @return $this
      */
@@ -161,7 +161,7 @@ class Route
     }
 
     /**
-     * @param callable $handler
+     * @param string $handler
      *
      * @return $this
      */
@@ -173,7 +173,7 @@ class Route
     }
 
     /**
-     * @param callable $handler
+     * @param string $handler
      *
      * @return $this
      */
@@ -185,7 +185,7 @@ class Route
     }
 
     /**
-     * @param callable $handler
+     * @param string $handler
      *
      * @return $this
      */
@@ -197,7 +197,7 @@ class Route
     }
 
     /**
-     * @param callable $handler
+     * @param string $handler
      *
      * @return $this
      */

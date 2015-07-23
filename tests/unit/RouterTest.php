@@ -1,5 +1,9 @@
 <?php
 
+use TreeRoute\Dispatcher;
+use TreeRoute\Result;
+use TreeRoute\Router;
+
 class SampleUrlHelper extends \TreeRoute\UrlHelper
 {
     /**
@@ -11,6 +15,13 @@ class SampleUrlHelper extends \TreeRoute\UrlHelper
     public function content($id, $title)
     {
         return "/content/{$id}/{$this->slug($title)}";
+    }
+}
+
+class SampleController implements \TreeRoute\Controller
+{
+    public function run($id, $title) {
+        return array($id, $title);
     }
 }
 
@@ -32,10 +43,10 @@ class RouterTest extends \Codeception\TestCase\Test
     }
 
     /**
-     * @param \TreeRoute\Result $result
+     * @param Result $result
      * @param int $code
      */
-    private function assertResultIsError(\TreeRoute\Result $result, $code)
+    private function assertResultIsError(Result $result, $code)
     {
         $this->assertNotNull($result->error, 'expected Error instance');
 
@@ -45,9 +56,9 @@ class RouterTest extends \Codeception\TestCase\Test
     }
 
     /**
-     * @param \TreeRoute\Result $result
+     * @param Result $result
      */
-    private function assertResultIsSuccess(\TreeRoute\Result $result)
+    private function assertResultIsSuccess(Result $result)
     {
         $this->assertEmpty($result->error);
     }
@@ -81,7 +92,7 @@ class RouterTest extends \Codeception\TestCase\Test
 
     public function testRouter()
     {
-        $router = new \TreeRoute\Router();
+        $router = new Router();
 
         $router->route('/')->get('handler0');
 
@@ -146,7 +157,7 @@ class RouterTest extends \Codeception\TestCase\Test
 
         $this->specify('should save and restore routes', function () use ($router) {
             $routes = $router->getRoutes();
-            $router = new \TreeRoute\Router();
+            $router = new Router();
             $result = $router->resolve('GET', '/');
             $this->assertResultIsError($result, 405);
             $router->setRoutes($routes);
@@ -172,7 +183,7 @@ class RouterTest extends \Codeception\TestCase\Test
         });
 
         $this->specify('can build routes progressively', function () {
-            $router = new \TreeRoute\Router();
+            $router = new Router();
 
             // using statement-groups to clarify the created structure:
 
@@ -196,16 +207,17 @@ class RouterTest extends \Codeception\TestCase\Test
         });
 
         $this->specify('should dispatch handlers with parameters', function () {
-            $router = new \TreeRoute\Router();
-            $router->route('content/<id:int>-<title:slug>')->get(function ($id, $title) {
-                return array($id, $title);
-            });
-            $result = $router->dispatch('GET', '/content/123-hello-world');
+            $router = new Router();
+            $router->route('content/<id:int>-<title:slug>')->get(SampleController::class);
+
+            $dispatcher = new Dispatcher($router);
+
+            $result = $dispatcher->dispatch('GET', '/content/123-hello-world');
             $this->assertEquals(array('123', 'hello-world'), $result);
         });
 
         $this->specify('can create URL', function () {
-            $router = new \TreeRoute\Router();
+            $router = new Router();
             $router->route('content/<id:int>/<title:slug>')->get('content');
 
             $url = new SampleUrlHelper();
