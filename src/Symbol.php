@@ -20,12 +20,7 @@ class Symbol
     public $expression;
 
     /**
-     * @var Closure|null optional function to encode a symbol value: `function (mixed $value) : string`
+     * @var Closure|null optional function to parse parameter values: `function (string $value) : mixed`
      */
-    public $encode;
-
-    /**
-     * @var Closure|null optional function to decode parameter values: `function (string $value) : mixed`
-     */
-    public $decode;
+    public $parse;
 }

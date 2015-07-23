@@ -1,5 +1,19 @@
 <?php
 
+class SampleUrlHelper extends \TreeRoute\UrlHelper
+{
+    /**
+     * @param int $id
+     * @param string $title
+     *
+     * @return string
+     */
+    public function content($id, $title)
+    {
+        return "/content/{$id}/{$this->slug($title)}";
+    }
+}
+
 class RouterTest extends \Codeception\TestCase\Test
 {
     use \Codeception\Specify;
@@ -192,12 +206,13 @@ class RouterTest extends \Codeception\TestCase\Test
 
         $this->specify('can create URL', function () {
             $router = new \TreeRoute\Router();
-            $route = $router->route('content/<id:int>/<title:slug>');
-            $this->assertEquals('/content/123/hello-world', $route->url(['id' => 123, 'title' => 'Hello, World!']));
+            $router->route('content/<id:int>/<title:slug>')->get('content');
 
-            $this->assertException(UnexpectedValueException::class, 'unexpected type: array', function () use ($route) {
-                $route->url(['id' => array(), 'title' => 'Oops']); // will throw because of type violation
-            });
+            $url = new SampleUrlHelper();
+            $content_url = $url->content(123, 'Hello, World!');
+
+            $this->assertEquals('/content/123/hello-world', $content_url);
+            $this->assertEquals('content', $router->resolve('GET', $content_url)->handler);
         });
     }
 }

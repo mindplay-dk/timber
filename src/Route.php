@@ -113,32 +113,6 @@ class Route
     }
 
     /**
-     * @param array $params
-     *
-     * @return string
-     */
-    public function url($params = array())
-    {
-        return preg_replace_callback(
-            Router::PARAM_PATTERN,
-            function ($matches) use ($params) {
-                $name = $matches[1];
-
-                if (isset($matches[2])) {
-                    $pattern = $matches[2];
-
-                    if (isset($this->registry->symbols[$pattern]->encode)) {
-                        return call_user_func($this->registry->symbols[$pattern]->encode, $params[$name]);
-                    }
-                }
-
-                return $params[$name];
-            },
-            $this->pattern
-        );
-    }
-
-    /**
      * @param callable $handler
      *
      * @return $this

@@ -98,3 +98,28 @@ Benchmark
 ---------
 
 https://github.com/baryshev/FastRoute-vs-TreeRoute
+
+Design Notes
+------------
+
+During the development of this library, a [design problem](commit/8bb93921c0a8b90d97f0143c0eebdf4ba44b0294)
+was identified, which required us to make a trade-off. This library did at one point have URL creation as
+a feature, but after carefully weighing the pros and cons, it was decided to forego this feature, in favor
+of simpler implementation and support for caching.
+
+Use-cases for [three different approaches](https://gist.github.com/mindplay-dk/feb4768dbb118c651ba0)
+were explored and evaluated - our [whiteboard](https://goo.gl/photos/CZLk7iJCzeJfS3A58) summarizes the
+pros and cons as we saw them, and the approach without URL creation was unanimously our favorite, as it
+leads to the greatest simplicity, both in the library and in the use-case, and supports caching.
+
+The first trade-off is that we don't get to use closures (which can't be serialized) and thereby do not
+get any direct static coupling between the route and controller/action/params - we do get static coupling
+to the controller class-name, by using the `::class` constant.
+
+The other trade-off is that we can't have a URL creation feature within the router itself, as this leads to
+either complexity (with the addition of a named route registry as per [case 1](https://gist.github.com/mindplay-dk/feb4768dbb118c651ba0#file-router-1-php))
+or prevents caching (as per [case 2](https://gist.github.com/mindplay-dk/feb4768dbb118c651ba0#file-router-2-php) -
+after some discussion, we decided URL creation provides only a small benefit, guaranteeing that URL creation
+is consistent with defined patterns; but also, we value the freedom to fully customize URL creation on a
+case-by-case basis using simpler code (as per [case 3](https://gist.github.com/mindplay-dk/feb4768dbb118c651ba0#file-router-3-php))
+and as such the absence of URL creation can actually be seen as a benefit.
