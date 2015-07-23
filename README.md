@@ -85,7 +85,7 @@ $router->route('/news/<id:int>', ShowNews::class);
 
 $dispatcher = new Dispatcher($router);
 
-$dispatcher->dispatch('GET', '/news');
+$dispatcher->run('GET', '/news');
 ```
 
 The named parameter in this example will be converted to an integer and provided
