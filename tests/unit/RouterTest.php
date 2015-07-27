@@ -212,7 +212,7 @@ class RouterTest extends Test
 
         $this->specify('should dispatch handlers with parameters', function () {
             $router = new Router();
-            $router->route('content/<id:int>-<title:slug>')->get(SampleController::class);
+            $router->route('content/<id:int>-<title:slug>')->get('SampleController');
 
             $dispatcher = new Dispatcher($router);
 
