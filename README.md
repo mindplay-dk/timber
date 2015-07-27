@@ -1,5 +1,7 @@
 # mindplay/timber
 
+[![Build Status](https://travis-ci.org/mindplay-dk/timber.svg)](https://travis-ci.org/mindplay-dk/timber)
+
 Timber is a request router with regular expression support, high performance, and a
 developer-friendly, human-readable API.
 
