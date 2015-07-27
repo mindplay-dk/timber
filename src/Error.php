@@ -1,6 +1,6 @@
 <?php
 
-namespace TreeRoute;
+namespace mindplay\timber;
 
 /**
  * This model represents an error generated while attempting to dispatch a Router.

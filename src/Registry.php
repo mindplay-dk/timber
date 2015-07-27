@@ -1,6 +1,6 @@
 <?php
 
-namespace TreeRoute;
+namespace mindplay\timber;
 
 /**
  * This model defines a registry for Symbols and named routes

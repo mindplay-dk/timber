@@ -1,6 +1,6 @@
 {
-    "name": "baryshev/tree-route",
-    "description": "Perfomance focused request router",
+    "name": "mindplay/timber",
+    "description": "Timber is a request router with regular expression support, high performance, and a developer-friendly, human-readable API",
     "keywords": [
         "routing",
         "router"
@@ -21,7 +21,7 @@
     },
     "autoload": {
         "psr-4": {
-            "TreeRoute\\": "src/"
+            "mindplay\\timber\\": "src/"
         }
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace TreeRoute;
+namespace mindplay\timber;
 
 use Closure;
 use ReflectionFunction;

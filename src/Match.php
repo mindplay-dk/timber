@@ -1,6 +1,6 @@
 <?php
 
-namespace TreeRoute;
+namespace mindplay\timber;
 
 /**
  * This model represents the result of an attempted match.

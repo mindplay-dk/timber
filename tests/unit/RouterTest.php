@@ -1,10 +1,14 @@
 <?php
 
-use TreeRoute\Dispatcher;
-use TreeRoute\Result;
-use TreeRoute\Router;
+use Codeception\Specify;
+use Codeception\TestCase\Test;
+use mindplay\timber\Controller;
+use mindplay\timber\Dispatcher;
+use mindplay\timber\Result;
+use mindplay\timber\Router;
+use mindplay\timber\UrlHelper;
 
-class SampleUrlHelper extends \TreeRoute\UrlHelper
+class SampleUrlHelper extends UrlHelper
 {
     /**
      * @param int $id
@@ -18,16 +22,16 @@ class SampleUrlHelper extends \TreeRoute\UrlHelper
     }
 }
 
-class SampleController implements \TreeRoute\Controller
+class SampleController implements Controller
 {
     public function run($id, $title) {
         return array($id, $title);
     }
 }
 
-class RouterTest extends \Codeception\TestCase\Test
+class RouterTest extends Test
 {
-    use \Codeception\Specify;
+    use Specify;
 
     /**
      * @var \UnitTester

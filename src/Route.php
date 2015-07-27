@@ -1,6 +1,6 @@
 <?php
 
-namespace TreeRoute;
+namespace mindplay\timber;
 
 /**
  * This class represents a route, or part of a route, within a Router.

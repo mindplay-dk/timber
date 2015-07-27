@@ -1,6 +1,6 @@
 <?php
 
-namespace TreeRoute;
+namespace mindplay\timber;
 
 /**
  * This class represents the result of an attempted Router dispatch.
