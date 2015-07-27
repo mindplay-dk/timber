@@ -33,6 +33,9 @@ Dispatcher only, and as such, you can easily implement any convention or strateg
 like, either by doing your own dispatch (without using our Dispatcher) or by extending
 the Dispatcher and overriding the `toCallable()` function.
 
+Note the use of the magic `::class` constant in the following examples - the library is
+compatible with PHP 5.4, but this syntax is only supported by PHP 5.5 and up.
+
 Basic usage of the router, without Dispatcher, goes a little something like this:
 
 ```PHP
