@@ -46,19 +46,22 @@ require __DIR__ . '/vendor/autoload.php';
 $router = new Router();
 
 // Defining route for one HTTP method
-$router->route('/news')->get(ListNews::class);
+$router->route('news')->get(ListNews::class);
 
 // Defining route for several HTTP methods
 $router->route('/')->get(ShowHomePage::class)->post(PostComments::class);
 
 // Defining a route with regular expression param
-$news_route = $router->route('/news/<id:^[0-9]+$>')->get(ShowNews::class);
+$news_route = $router->route('news/<id:^[0-9]+$>')->get(ShowNews::class);
 
 // Defining another route with symbolic param
-$router->route('/users/<username:slug>')->get(ShowUser::class);
+$router->route('users/<username:slug>')->get(ShowUser::class);
 
 // Defining static route that conflicts with previous route, but static routes have high priority
-$router->route('/news/all')->get(ShowAllNews::class);
+$router->route('news/all')->get(ShowAllNews::class);
+
+// Defining a wildcard route, matching e.g. "categories/foo", "categories/foo/bar", etc.:
+$router->route('categories/*')->get(ShowCategory::class);
 
 // Resolve HTTP method and URL:
 
@@ -91,10 +94,10 @@ If you're building a set of routes under the same parent route, you can continue
 from by keeping a temporary reference to a parent route - for example:
 
 ```PHP
-$admin = $router->route('/admin')->get(AdminMenu::class);
+$admin = $router->route('admin')->get(AdminMenu::class);
 
-$admin->route('/users')->get(AdminUserList::class);
-$admin->route('/groups')->get(AdminGroupList::class);
+$admin->route('users')->get(AdminUserList::class);
+$admin->route('groups')->get(AdminGroupList::class);
 ```
 
 This example will route `/admin` to `AdminMenu`, and `/admin/users` to `AdminUserList`, etc.
@@ -104,12 +107,12 @@ and also enables modular reuse of route definitions - for example:
 
 ```PHP
 $build_comment_routes = function (Route $parent) {
-    $parent->route('/comments')->get(ShowComments::class);
-    $parent->route('/comments/new')->get(ShowCommentForm::class)->post(PostComment::class);
+    $parent->route('comments')->get(ShowComments::class);
+    $parent->route('comments/new')->get(ShowCommentForm::class)->post(PostComment::class);
 }
 
-$build_comment_routes($router->route('/articles/<article_id:int>'));
-$build_comment_routes($router->route('/products/<product_id:int>'));
+$build_comment_routes($router->route('articles/<article_id:int>'));
+$build_comment_routes($router->route('products/<product_id:int>'));
 ```
 
 This example creates two identical sets of routes for displaying and posting comments for two
@@ -135,7 +138,7 @@ class ShowNews implements Controller
 }
 
 $router = new Router();
-$router->route('/news/<id:int>', ShowNews::class);
+$router->route('news/<id:int>', ShowNews::class);
 
 $dispatcher = new Dispatcher($router);
 
