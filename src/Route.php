@@ -2,6 +2,8 @@
 
 namespace mindplay\timber;
 
+use RuntimeException;
+
 /**
  * This class represents a route, or part of a route, within a Router.
  */
@@ -33,6 +35,11 @@ class Route
     public $regexps = array();
 
     /**
+     * @var Route|null the wildcard Route (if any)
+     */
+    public $wildcard;
+
+    /**
      * @var Registry
      */
     protected $registry;
@@ -52,18 +59,30 @@ class Route
      */
     public function route($pattern)
     {
-        $parts = explode('?', $pattern, 1);
-        $parts = explode('/', preg_replace(Router::SEPARATOR_PATTERN, '', $parts[0]));
+        $parts = explode('/', trim($pattern, '/'));
 
-        if (sizeof($parts) === 1 && $parts[0] === '') {
+        if (count($parts) === 1 && $parts[0] === '') {
             $parts = [];
         }
 
         $current = $this;
         $pattern = $this->pattern;
 
-        foreach ($parts as $part) {
-            $pattern .= '/' . $part;
+        foreach ($parts as $index => $part) {
+            if ($part === '*') {
+                $pattern .= '/.*$';
+
+                if (count($parts) !== $index + 1) {
+                    throw new RuntimeException("the asterisk wildcard route is terminal");
+                }
+
+                if (!isset($current->wildcard)) {
+                    $current->wildcard = new Route($this->registry);
+                }
+            } else {
+                $pattern .= '/' . $part;
+            }
+
             $params = array();
 
             $part = preg_replace_callback(
@@ -91,7 +110,9 @@ class Route
                 $part
             );
 
-            if (strpos($part, '(?<') !== false) {
+            if ($current->wildcard) {
+                $current = $current->wildcard;
+            } elseif (strpos($part, '(?<') !== false) {
                 // pattern contains named parameter capture
                 if (!isset($current->regexps[$part])) {
                     $current->regexps[$part] = new Route($this->registry);

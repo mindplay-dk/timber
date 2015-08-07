@@ -100,14 +100,14 @@ class RouterTest extends Test
 
         $router->route('/')->get('handler0');
 
-        $this->specify('should find existed route', function () use ($router) {
+        $this->specify('should find existing route', function () use ($router) {
             $result = $router->resolve('GET', '/');
             $this->assertResultIsSuccess($result);
             $this->assertEquals('handler0', $result->handler);
         });
 
-        $this->specify('should return 404 error for not existed route', function () use ($router) {
-            $result = $router->resolve('GET', '/not/existed/url');
+        $this->specify('should return 404 error for non-existing route', function () use ($router) {
+            $result = $router->resolve('GET', '/nothing/here/dude');
             $this->assertResultIsError($result, 404);
         });
 
@@ -150,6 +150,21 @@ class RouterTest extends Test
             $result = $router->resolve('GET', '/users/123');
             $this->assertEquals('handler4', $result->handler);
             $this->assertEquals(123, $result->params['id']);
+        });
+
+        $this->specify('should throw for unexpected query string', function () use ($router) {
+            $this->assertException(
+                'RuntimeException',
+                'unexpected query string in $url: /users/bob?crazy-yo',
+                function () use ($router) {
+                    $router->resolve('GET', '/users/bob?crazy-yo');
+                }
+            );
+        });
+
+        $this->specify('should normalize URL in Result', function () use ($router) {
+            $this->assertEquals('/users/bob', $router->resolve('GET', 'users/bob')->url);
+            $this->assertEquals('/users/bob', $router->resolve('GET', '/users/bob')->url);
         });
 
         $this->specify('should give greater priority to statically defined route', function () use ($router) {
@@ -229,6 +244,26 @@ class RouterTest extends Test
 
             $this->assertEquals('/content/123/hello-world', $content_url);
             $this->assertEquals('content', $router->resolve('GET', $content_url)->handler);
+        });
+
+        $this->specify('can use wildcard in patterns', function () {
+            $router = new Router();
+
+            $router->route('categories/<id:int>')->get('cat_id');
+            $router->route('categories/fish')->get('cat_fish');
+            $router->route('categories/*')->get('cat_wild');
+
+            $this->assertEquals('cat_id', $router->resolve('GET', '/categories/123')->handler);
+            $this->assertEquals('cat_fish', $router->resolve('GET', '/categories/fish')->handler);
+            $this->assertEquals('cat_wild', $router->resolve('GET', '/categories/what/ever')->handler);
+
+            $this->assertException(
+                'RuntimeException',
+                'the asterisk wildcard route is terminal',
+                function () use ($router) {
+                    $router->route('categories/*/oh-noes');
+                }
+            );
         });
     }
 }

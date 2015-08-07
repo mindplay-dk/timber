@@ -7,8 +7,10 @@ use UnexpectedValueException;
 
 class Router
 {
+    /**
+     * @var string parameter pattern; matches tokens like `<foo>` or `<foo:bar>`
+     */
     const PARAM_PATTERN = '/(?<!\(\?)<([^\:]+)(?:$|\:([^>]+)|)>/';
-    const SEPARATOR_PATTERN = '/^[\s\/]+|[\s\/]+$/';
 
     /**
      * @var Route root Route (e.g. corresponding to "/")
@@ -69,12 +71,20 @@ class Router
      */
     protected function match($url)
     {
-        $parts = explode('?', $url, 1);
-        $parts = explode('/', preg_replace(self::SEPARATOR_PATTERN, '', $parts[0]));
-        if (sizeof($parts) === 1 && $parts[0] === '') {
+        if (strpos($url, '?') !== false) {
+            throw new RuntimeException("unexpected query string in \$url: {$url}");
+        }
+
+        $url = trim($url, '/');
+
+        $parts = explode('/', $url);
+
+        if (count($parts) === 1 && $parts[0] === '') {
             $parts = [];
         }
+
         $params = [];
+
         $current = $this->root;
 
         foreach ($parts as $part) {
@@ -107,6 +117,12 @@ class Router
                         continue 2;
                     }
                 }
+
+                if (isset($current->wildcard)) {
+                    $current = $current->wildcard;
+                    break;
+                }
+
                 return null;
             }
         }
@@ -116,6 +132,7 @@ class Router
         } else {
             return new Match(
                 $current,
+                '/' . $url,
                 $params
             );
         }
@@ -134,7 +151,7 @@ class Router
     /**
      * @param string $url
      *
-     * @return string[]|null list of supported HTTP method names
+     * @return string[]|null list of supported HTTP method names (or NULL, if no route matches the given URL)
      */
     public function getMethods($url)
     {
@@ -158,7 +175,7 @@ class Router
         $match = $this->match($url);
 
         $result = new Result();
-        $result->url = $url;
+        $result->url = $match ? $match->url : $url;
         $result->method = $method;
 
         if (!$match) {

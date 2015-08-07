@@ -10,12 +10,14 @@ namespace mindplay\timber;
 class Match
 {
     /**
-     * @param Route      $route
-     * @param string[]   $params
+     * @param Route    $route  the Route that matched the URL
+     * @param string   $url    the URL that was matched
+     * @param string[] $params captured parameters
      */
-    public function __construct(Route $route, $params)
+    public function __construct(Route $route, $url, $params)
     {
         $this->route = $route;
+        $this->url = $url;
         $this->params = $params;
     }
 
@@ -25,9 +27,9 @@ class Match
     public $route;
 
     /**
-     * @var callable[] map where HTTP method name => callable
+     * @var string the URL that was matched
      */
-    public $methods;
+    public $url;
 
     /**
      * @var string[] map where parameter name => parameter
