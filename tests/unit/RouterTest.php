@@ -74,24 +74,19 @@ class RouterTest extends Test
      */
     protected function assertException($type, $message, callable $function)
     {
-        $thrown = false;
-        $reason = 'no exception thrown';
+        $exception = null;
 
         try {
             call_user_func($function);
         } catch (Exception $e) {
-            if ($e instanceof $type) {
-                if ($message === null || strcasecmp($message, $e->getMessage()) === 0) {
-                    $thrown = true;
-                } else {
-                    $reason = "unexpected message: \"{$e->getMessage()}\", expected: \"{$message}\"";
-                }
-            } else {
-                $reason = "unexpected type: " . get_class($e);
-            }
+            $exception = $e;
         }
 
-        $this->assertTrue($thrown, "Expected exception: {$type}" . ($reason ? " ({$reason})" : ""));
+        self::assertThat($exception, new PHPUnit_Framework_Constraint_Exception($type));
+
+        if ($message !== null) {
+            self::assertThat($exception, new PHPUnit_Framework_Constraint_ExceptionMessage($message));
+        }
     }
 
     public function testRouter()
