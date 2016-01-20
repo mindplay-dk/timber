@@ -21,7 +21,7 @@
     },
     "require-dev": {
         "mindplay/testies": "dev-master",
-        "phpunit/php-code-coverage": "^3.1"
+        "phpunit/php-code-coverage": "^2.2.4"
     },
     "autoload": {
         "psr-4": {
