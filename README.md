@@ -189,15 +189,9 @@ in a very large modular project.
 
 ## Hacking
 
-Install the package as a project by running:
-
-    composer install
-
 To run the test-suite, navigate to the project root folder and type:
 
-    bin/codecept run
-
-The test-suite is based on [codeception](http://codeception.com/).
+    php test/test.php
 
 
 ## Design Notes
