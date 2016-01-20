@@ -187,6 +187,19 @@ an extremely high number of routes (hundreds or thousands) may make this worthwh
 in a very large modular project.
 
 
+## Hacking
+
+Install the package as a project by running:
+
+    composer install
+
+To run the test-suite, navigate to the project root folder and type:
+
+    bin/codecept run
+
+The test-suite is based on [codeception](http://codeception.com/).
+
+
 ## Design Notes
 
 During the development of this library, a [design problem](commit/8bb93921c0a8b90d97f0143c0eebdf4ba44b0294)
