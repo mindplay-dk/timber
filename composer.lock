@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3b38880482e8c9f40dc8ade0ccfb93f0",
+    "hash": "3912eecc4f996ba989b1bcb38e4c69f9",
     "content-hash": "bbc77db9e0843c1d9a3612ba0a196e88",
     "packages": [],
     "packages-dev": [
@@ -14,12 +14,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mindplay-dk/testies.git",
-                "reference": "d9a80382bce346b2be3d5a8ddabddcdc7c8a73ef"
+                "reference": "272516fe2232929032e09002f380437a23aa3feb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mindplay-dk/testies/zipball/d9a80382bce346b2be3d5a8ddabddcdc7c8a73ef",
-                "reference": "d9a80382bce346b2be3d5a8ddabddcdc7c8a73ef",
+                "url": "https://api.github.com/repos/mindplay-dk/testies/zipball/272516fe2232929032e09002f380437a23aa3feb",
+                "reference": "272516fe2232929032e09002f380437a23aa3feb",
                 "shasum": ""
             },
             "require-dev": {
@@ -49,7 +49,7 @@
                 }
             ],
             "description": "Yeah, testies: a lightweight library for quick, simple unit-testing",
-            "time": "2015-12-11 09:09:19"
+            "time": "2016-05-09 09:41:04"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -252,16 +252,16 @@
         },
         {
             "name": "sebastian/environment",
-            "version": "1.3.3",
+            "version": "1.3.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/environment.git",
-                "reference": "6e7133793a8e5a5714a551a8324337374be209df"
+                "reference": "4e8f0da10ac5802913afc151413bc8c53b6c2716"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/6e7133793a8e5a5714a551a8324337374be209df",
-                "reference": "6e7133793a8e5a5714a551a8324337374be209df",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/4e8f0da10ac5802913afc151413bc8c53b6c2716",
+                "reference": "4e8f0da10ac5802913afc151413bc8c53b6c2716",
                 "shasum": ""
             },
             "require": {
@@ -298,7 +298,7 @@
                 "environment",
                 "hhvm"
             ],
-            "time": "2015-12-02 08:37:27"
+            "time": "2016-05-17 03:18:57"
         },
         {
             "name": "sebastian/version",

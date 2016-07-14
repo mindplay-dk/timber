@@ -175,7 +175,7 @@ class Router
         $match = $this->match($url);
 
         $result = new Result();
-        $result->url = $match ? $match->url : $url;
+        $result->url = $match ? $match->url : '/' . ltrim($url, '/');
         $result->method = $method;
 
         if (!$match) {
