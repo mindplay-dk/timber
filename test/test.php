@@ -86,6 +86,30 @@ test(
 );
 
 test(
+    'should respond to HEAD requests',
+    function () {
+        $router = new Router();
+
+        $router->route('/defined-head')->get('get-handler')->head('head-handler');
+        $router->route('/auto-head')->get('get-handler');
+        $router->route('/only-head')->head('head-handler');
+        $router->route('/no-head');
+
+        check_success($router->resolve('GET', '/defined-head'));
+        check_success($router->resolve('HEAD', '/defined-head'));
+
+        check_success($router->resolve('GET', '/auto-head'));
+        check_success($router->resolve('HEAD', '/auto-head'));
+
+        check_error($router->resolve('GET', '/only-head'), 404);
+        check_success($router->resolve('HEAD', '/auto-head'));
+
+        check_error($router->resolve('GET', '/no-head'), 404);
+        check_success($router->resolve('HEAD', '/no-head'));
+    }
+);
+
+test(
     'should define route with short methods',
     function () {
         $router = new Router();
@@ -154,7 +178,7 @@ test(
             function () use ($router) {
                 $router->resolve('GET', '/users/bob?crazy-yo');
             },
-            '#^'.preg_quote('unexpected query string in $url: /users/bob?crazy-yo').'$#'
+            '#^' . preg_quote('unexpected query string in $url: /users/bob?crazy-yo') . '$#'
         );
     }
 );

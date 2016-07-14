@@ -30,7 +30,8 @@ class Result
     public $params = array();
 
     /**
-     * @var string|null handler defined for the attempted HTTP method (or NULL, if this Result is an error)
+     * @var string|null handler defined for the attempted HTTP method
+     *                  (or NULL, if this Result is an error, or a successful HEAD request with no defined handler)
      */
     public $handler;
 
