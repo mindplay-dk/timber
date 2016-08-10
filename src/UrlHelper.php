@@ -2,6 +2,7 @@
 
 namespace mindplay\timber;
 
+use InvalidArgumentException;
 use UnexpectedValueException;
 
 /**
@@ -10,8 +11,8 @@ use UnexpectedValueException;
 abstract class UrlHelper
 {
     /**
-     * @var int
-     * @see sanitize()
+     * @var int default max. length of slug strings
+     * @see slug()
      */
     protected $slug_max_length = 100;
 
@@ -39,27 +40,25 @@ abstract class UrlHelper
     /**
      * String assertion and "slug" conversion, e.g. prepare text for use as a URL token
      *
-     * @param mixed $value
+     * @param mixed    $value input string (or string-castable object/value; assumes UTF-8)
+     * @param int|null $max_length optional max. length of slug string (defaults to $this->slug_max_length)
      *
      * @return string sanitized string for use in URL tokens (lowercase a-z, 0-9 and hyphens)
      *
-     * @link https://github.com/vito/chyrp/blob/35c646dda657300b345a233ab10eaca7ccd4ec10/includes/helpers.php#L515
+     * @throws InvalidArgumentException if the given string contains no allowed characters
      */
-    protected function slug($value) {
+    protected function slug($value, $max_length = null) {
         $string = $this->str($value);
 
-        static $strip = array("~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]",
-            "}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;",
-            "—", "–", ",", "<", ".", ">", "/", "?");
+        $clean = mb_strtolower($string, 'UTF-8');
+        $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $clean); // collate diacritics, e.g. Ã¥ => a
+        $clean = preg_replace('/[^a-zA-Z0-9]+/', '-', $clean); //
+        $clean = preg_replace('/(^-+|-+$)/', '', $clean);
 
-        $clean = trim(str_replace($strip, "", strip_tags($string)));
-        $clean = preg_replace('/\s+/', "-", $clean);
-        $clean = preg_replace("/[^a-zA-Z0-9-]/", "", $clean);
-        $clean = substr($clean, 0, $this->slug_max_length);
-        $clean = function_exists('mb_strtolower') ?
-            mb_strtolower($clean, 'UTF-8') :
-            strtolower($clean);
+        if (strlen($clean) === 0) {
+            throw new InvalidArgumentException("the given string contains no allowed characters");
+        }
 
-        return $clean;
+        return substr($clean, 0, $max_length ?: $this->slug_max_length);
     }
 }

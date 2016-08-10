@@ -8,6 +8,20 @@ use mindplay\timber\UrlHelper;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
+class SlugTester extends UrlHelper
+{
+    /**
+     * @param string $input
+     * @param string $expected
+     *
+     * @return string
+     */
+    public function test($input, $expected)
+    {
+        eq("{$this->slug($input)}", $expected);
+    }
+}
+
 class SampleUrlHelper extends UrlHelper
 {
     /**
@@ -289,6 +303,29 @@ test(
 
         eq($content_url, '/content/123/hello-world');
         eq($router->resolve('GET', $content_url)->handler, 'content');
+    }
+);
+
+test(
+    'can create slugs',
+    function () {
+        $url = new SlugTester();
+
+        $url->test(' Hello, World! ', 'hello-world');
+
+        $url->test('__foo+bar--', 'foo-bar');
+
+        $url->test('æøå', 'aeoa');
+
+        $url->test('ÆØÅ', 'aeoa');
+
+        expect(
+            'InvalidArgumentException',
+            'should throw when no valid characters are present',
+            function () use ($url) {
+                $url->test('!@#$%!', '');
+            }
+        );
     }
 );
 
