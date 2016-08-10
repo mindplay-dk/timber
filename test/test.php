@@ -22,6 +22,21 @@ class SlugTester extends UrlHelper
     }
 }
 
+class ReplaceTester extends UrlHelper
+{
+    /**
+     * @param string $template
+     * @param array  $tokens
+     * @param string $expected
+     *
+     * @return string
+     */
+    public function test($template, $tokens, $expected)
+    {
+        eq($this->replace($template, $tokens), $expected);
+    }
+}
+
 class SampleUrlHelper extends UrlHelper
 {
     /**
@@ -40,7 +55,7 @@ class SampleController implements Controller
 {
     public function run($id, $title)
     {
-        return array($id, $title);
+        return [$id, $title];
     }
 }
 
@@ -168,7 +183,7 @@ test(
             function () use ($router) {
                 $router->resolve('GET', '/users/bob?crazy-yo');
             },
-            '#^'.preg_quote('unexpected query string in $url: /users/bob?crazy-yo').'$#'
+            '#^' . preg_quote('unexpected query string in $url: /users/bob?crazy-yo') . '$#'
         );
     }
 );
@@ -327,6 +342,28 @@ test(
             function () use ($url) {
                 $url->test('!@#$%!', '');
             }
+        );
+    }
+);
+
+test(
+    'can replace tokens in templates',
+    function () {
+        $replace = new ReplaceTester();
+
+        $replace->test('foo/<bar>', ['bar' => 'hello'], 'foo/hello');
+
+        $replace->test('foo/<bar:slug>', ['bar' => 'hello'], 'foo/hello');
+
+        $replace->test('foo/<bar:slug>/<baz:\w+>', ['bar' => 'hello', 'baz' => 'world'], 'foo/hello/world');
+
+        expect(
+            'InvalidArgumentException',
+            'should throw for missing replacements token',
+            function () use ($replace) {
+                $replace->test('foo/<bar>/<baz>', ['bar' => 'hello'], 'foo/hello/');
+            },
+            '/for token: baz/'
         );
     }
 );

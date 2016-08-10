@@ -71,4 +71,30 @@ abstract class UrlHelper
 
         return substr($clean, 0, $max_length ?: $this->slug_max_length);
     }
+
+    /**
+     * Replaces a route template, with placeholders such as "<foo>" or "<foo:bar>", with
+     * a set of replacement values.
+     *
+     * @param string $template route template
+     * @param array  $values   map where token name => replacement value
+     *
+     * @return string
+     */
+    protected function replace($template, $values)
+    {
+        return preg_replace_callback(
+            Router::PARAM_PATTERN,
+            function ($matches) use ($values) {
+                $name = $matches[1];
+
+                if (!isset($values[$name])) {
+                    throw new InvalidArgumentException("missing replacement value for token: {$name}");
+                }
+
+                return $values[$name];
+            },
+            $template
+        );
+    }
 }
