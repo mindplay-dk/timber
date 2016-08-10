@@ -10,7 +10,7 @@ class Router
     /**
      * @var string parameter pattern; matches tokens like `<foo>` or `<foo:bar>`
      */
-    const PARAM_PATTERN = '/(?<!\(\?)<([^\:]+)(?:$|\:([^>]+)|)>/';
+    const PARAM_PATTERN = "/(?<!\\(\\?)<([^\\:>]+)(?:$|\\:([^>]+)|)>/"; # (?<!\(\?)<([^\:>]+)(?:$|\:([^>]+)|)>
 
     /**
      * @var Route root Route (e.g. corresponding to "/")
