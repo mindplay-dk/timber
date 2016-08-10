@@ -315,6 +315,8 @@ test(
 
         $url->test('__foo+bar--', 'foo-bar');
 
+        $url->test('áàâä', 'aaaa');
+
         $url->test('æøå', 'aeoa');
 
         $url->test('ÆØÅ', 'aeoa');

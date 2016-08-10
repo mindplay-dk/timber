@@ -50,10 +50,20 @@ abstract class UrlHelper
     protected function slug($value, $max_length = null) {
         $string = $this->str($value);
 
-        $clean = mb_strtolower($string, 'UTF-8');
-        $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $clean); // collate diacritics, e.g. å => a
-        $clean = preg_replace('/[^a-zA-Z0-9]+/', '-', $clean); //
-        $clean = preg_replace('/(^-+|-+$)/', '', $clean);
+        static $latin1 = [
+            // https://github.com/jbroadway/urlify
+            'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'A', 'Å' => 'A','Ă' => 'A', 'Æ' => 'AE', 'Ç' => 'C', 'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I',
+            'Ï' => 'I', 'Ð' => 'D', 'Ñ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'O', 'Ő' => 'O', 'Ø' => 'O', 'Œ' => 'OE' ,'Ș' => 'S','Ț' => 'T', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'U', 'Ű' => 'U',
+            'Ý' => 'Y', 'Þ' => 'TH', 'ß' => 'ss', 'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'a', 'å' => 'a', 'ă' => 'a', 'æ' => 'ae', 'ç' => 'c', 'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e',
+            'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ð' => 'd', 'ñ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'o', 'ő' => 'o', 'ø' => 'o', 'œ' => 'oe', 'ș' => 's', 'ț' => 't', 'ù' => 'u', 'ú' => 'u',
+            'û' => 'u', 'ü' => 'u', 'ű' => 'u', 'ý' => 'y', 'þ' => 'th', 'ÿ' => 'y'
+        ];
+
+        $clean = str_replace(array_keys($latin1), array_values($latin1), $string);
+        $clean = mb_strtolower($clean, 'UTF-8');
+        $clean = preg_replace('/[^a-zA-Z0-9]+/u', '-', $clean); // reduce disallowed char ranges to dashes
+        $clean = preg_replace('/[^a-zA-Z0-9-]+/u', '', $clean); // remove any remaining disallowed chars
+        $clean = preg_replace('/(^-+|-+$)/', '', $clean); // strip leading/trailing dashes
 
         if (strlen($clean) === 0) {
             throw new InvalidArgumentException("the given string contains no allowed characters");
