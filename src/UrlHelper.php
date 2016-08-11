@@ -57,7 +57,7 @@ abstract class UrlHelper
         } else {
             // use a less capable fallback-function with support for basic latin characters only:
 
-            static $latin1 = [
+            static $LATIN_1 = [
                 // https://github.com/jbroadway/urlify
                 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'A', 'Å' => 'A','Ă' => 'A', 'Æ' => 'AE', 'Ç' => 'C', 'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I',
                 'Ï' => 'I', 'Ð' => 'D', 'Ñ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'O', 'Ő' => 'O', 'Ø' => 'O', 'Œ' => 'OE' ,'Ș' => 'S','Ț' => 'T', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'U', 'Ű' => 'U',
@@ -66,7 +66,7 @@ abstract class UrlHelper
                 'û' => 'u', 'ü' => 'u', 'ű' => 'u', 'ý' => 'y', 'þ' => 'th', 'ÿ' => 'y'
             ];
 
-            $clean = str_replace(array_keys($latin1), array_values($latin1), $string);
+            $clean = str_replace(array_keys($LATIN_1), array_values($LATIN_1), $string);
             $clean = mb_strtolower($clean, 'UTF-8');
         }
 
