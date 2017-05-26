@@ -374,8 +374,8 @@ test(
         $router = new Router();
 
         $router->route('categories/<id:int>')->get('cat_id');
-        $router->route('categories/fish')->get('cat_fish');
         $router->route('categories/*')->get('cat_wild');
+        $router->route('categories/fish')->get('cat_fish');
 
         eq($router->resolve('GET', '/categories/123')->handler, 'cat_id');
         eq($router->resolve('GET', '/categories/fish')->handler, 'cat_fish');

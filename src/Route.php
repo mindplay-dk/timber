@@ -70,8 +70,6 @@ class Route
 
         foreach ($parts as $index => $part) {
             if ($part === '*') {
-                $pattern .= '/.*$';
-
                 if (count($parts) !== $index + 1) {
                     throw new RuntimeException("the asterisk wildcard route is terminal");
                 }
@@ -79,15 +77,19 @@ class Route
                 if (!isset($current->wildcard)) {
                     $current->wildcard = new Route($this->registry);
                 }
+
+                return $current->wildcard;
             } else {
                 $pattern .= '/' . $part;
             }
 
             $params = array();
 
+            $is_regexp = false;
+
             $part = preg_replace_callback(
                 Router::PARAM_PATTERN,
-                function ($matches) use (&$params) {
+                function ($matches) use (&$params, &$is_regexp) {
                     $name = $matches[1];
                     $pattern = '[^\/]+';
                     $symbol = null;
@@ -105,14 +107,14 @@ class Route
                         ? $symbol->name
                         : $pattern;
 
+                    $is_regexp = true;
+
                     return "(?<{$name}>{$pattern})";
                 },
                 $part
             );
 
-            if ($current->wildcard) {
-                $current = $current->wildcard;
-            } elseif (strpos($part, '(?<') !== false) {
+            if ($is_regexp || strpos($part, '(?<') !== false) {
                 // pattern contains named parameter capture
                 if (!isset($current->regexps[$part])) {
                     $current->regexps[$part] = new Route($this->registry);
