@@ -87,7 +87,7 @@ class Router
 
         $current = $this->root;
 
-        foreach ($parts as $part) {
+        foreach ($parts as $index => $part) {
             if (isset($current->children[$part])) {
                 $current = $current->children[$part];
             } else {
@@ -119,7 +119,12 @@ class Router
                 }
 
                 if (isset($current->wildcard)) {
+                    if ($current->wildcard_name) {
+                        $params[$current->wildcard_name] = implode('/', array_slice($parts, $index));
+                    }
+
                     $current = $current->wildcard;
+
                     break;
                 }
 
