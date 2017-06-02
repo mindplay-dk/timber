@@ -20,7 +20,7 @@
         "php": ">=5.4.0"
     },
     "require-dev": {
-        "mindplay/testies": "dev-master",
+        "mindplay/testies": "^0.3",
         "phpunit/php-code-coverage": "^2.2.4"
     },
     "suggest": {
