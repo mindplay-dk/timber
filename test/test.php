@@ -391,6 +391,30 @@ test(
     }
 );
 
+test(
+    'can capture wildcard in patterns',
+    function () {
+        $router = new Router();
+
+        $router->route('categories/<id:\d+>')->get('cat_id');
+        $router->route('categories/fish')->get('cat_fish');
+        $router->route('categories/<path:*>')->get('cat_wild');
+
+        eq($router->resolve('GET', '/categories/123')->handler, 'cat_id');
+        eq($router->resolve('GET', '/categories/fish')->handler, 'cat_fish');
+        eq($router->resolve('GET', '/categories/what/ever')->handler, 'cat_wild');
+        eq($router->resolve('GET', '/categories/what/ever')->params, ["path" => "what/ever"]);
+
+        expect(
+            'RuntimeException',
+            'the asterisk wildcard route is terminal',
+            function () use ($router) {
+                $router->route('categories/<path:*>/oh-noes');
+            }
+        );
+    }
+);
+
 configure()->enableCodeCoverage(__DIR__ . '/build/logs/clover.xml', dirname(__DIR__) . '/src');
 
 exit(run());

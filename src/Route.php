@@ -40,6 +40,11 @@ class Route
     public $wildcard;
 
     /**
+     * @var string|null wildcard parameter name (if any)
+     */
+    public $wildcard_name;
+
+    /**
      * @var Registry
      */
     protected $registry;
@@ -69,16 +74,11 @@ class Route
         $pattern = $this->pattern;
 
         foreach ($parts as $index => $part) {
+            $is_wildcard = false;
+            $wildcard_name = null;
+
             if ($part === '*') {
-                if (count($parts) !== $index + 1) {
-                    throw new RuntimeException("the asterisk wildcard route is terminal");
-                }
-
-                if (!isset($current->wildcard)) {
-                    $current->wildcard = new Route($this->registry);
-                }
-
-                return $current->wildcard;
+                $is_wildcard = true;
             } else {
                 $pattern .= '/' . $part;
             }
@@ -89,7 +89,7 @@ class Route
 
             $part = preg_replace_callback(
                 Router::PARAM_PATTERN,
-                function ($matches) use (&$params, &$is_regexp) {
+                function ($matches) use (&$params, &$is_regexp, &$is_wildcard, &$wildcard_name) {
                     $name = $matches[1];
                     $pattern = '[^\/]+';
                     $symbol = null;
@@ -97,7 +97,11 @@ class Route
                     if (isset($matches[2])) {
                         $pattern = $matches[2];
 
-                        if (isset($this->registry->symbols[$pattern])) {
+                        if ($pattern === "*") {
+                            $pattern = '/.*$';
+                            $is_wildcard = true;
+                            $wildcard_name = $name;
+                        } elseif (isset($this->registry->symbols[$pattern])) {
                             $symbol = $this->registry->symbols[$pattern];
                             $pattern = $symbol->expression;
                         }
@@ -114,7 +118,18 @@ class Route
                 $part
             );
 
-            if ($is_regexp || strpos($part, '(?<') !== false) {
+            if ($is_wildcard) {
+                if (count($parts) !== $index + 1) {
+                    throw new RuntimeException("the asterisk wildcard route is terminal");
+                }
+
+                if (!isset($current->wildcard)) {
+                    $current->wildcard = new Route($this->registry);
+                    $current->wildcard_name = $wildcard_name;
+                }
+
+                $current = $current->wildcard;
+            } elseif ($is_regexp || strpos($part, '(?<') !== false) {
                 // pattern contains named parameter capture
                 if (!isset($current->regexps[$part])) {
                     $current->regexps[$part] = new Route($this->registry);

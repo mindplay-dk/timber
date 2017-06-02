@@ -62,7 +62,7 @@ $router->route('users/<username:slug>')->get(ShowUser::class);
 $router->route('news/all')->get(ShowAllNews::class);
 
 // Defining a wildcard route, matching e.g. "categories/foo", "categories/foo/bar", etc.:
-$router->route('categories/*')->get(ShowCategory::class);
+$router->route('categories/<path:*>')->get(ShowCategory::class);
 
 // Resolve HTTP method and URL:
 
