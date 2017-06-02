@@ -392,7 +392,7 @@ test(
 );
 
 test(
-    'can use wildcard in patterns',
+    'can capture wildcard in patterns',
     function () {
         $router = new Router();
 
