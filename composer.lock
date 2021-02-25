@@ -4,16 +4,22 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8f917dcbaa719346851cb411b4b3bd54",
+    "content-hash": "c0bf33f1736d31d395daa26832b357b2",
     "packages": [],
     "packages-dev": [
         {
             "name": "mindplay/testies",
-            "version": "1.0.0.x-dev",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
-                "url": "https://mindplaydk@bitbucket.org/mindplaydk/testies.git",
-                "reference": "dbc8bf7838a871eb3afa586d72044c40a0e029b1"
+                "url": "https://github.com/mindplay-dk/testies.git",
+                "reference": "6501bc0ec4599948ee83284aa926538af839de50"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mindplay-dk/testies/zipball/6501bc0ec4599948ee83284aa926538af839de50",
+                "reference": "6501bc0ec4599948ee83284aa926538af839de50",
+                "shasum": ""
             },
             "require": {
                 "php": "^7.3 || ^8.0"
@@ -25,7 +31,6 @@
             "suggest": {
                 "phpunit/php-code-coverage": "^9.2.5"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -35,6 +40,7 @@
                     "mindplay\\testies\\": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -45,18 +51,20 @@
                 }
             ],
             "description": "Yeah, testies: a lightweight library for quick, simple unit-testing",
-            "time": "2020-12-22T19:19:14+00:00"
+            "support": {
+                "issues": "https://github.com/mindplay-dk/testies/issues",
+                "source": "https://github.com/mindplay-dk/testies/tree/1.0.0"
+            },
+            "time": "2021-02-25T09:50:25+00:00"
         }
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "mindplay/testies": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.4.0"
+        "php": "^7.3 || ^8.0"
     },
     "platform-dev": [],
     "plugin-api-version": "2.0.0"
