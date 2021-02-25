@@ -67,7 +67,7 @@ class Router
     /**
      * @param string $url
      *
-     * @return Match|null match information (or NULL, if no match was found)
+     * @return MatchInfo|null match information (or NULL, if no match was found)
      */
     protected function match($url)
     {
@@ -135,7 +135,7 @@ class Router
         if (!isset($current->handlers)) {
             return null;
         } else {
-            return new Match(
+            return new MatchInfo(
                 $current,
                 '/' . $url,
                 $params

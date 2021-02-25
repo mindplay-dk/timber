@@ -16,12 +16,17 @@
             "email": "rasmus@mindplay.dk"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://mindplaydk@bitbucket.org/mindplaydk/testies.git"
+        }
+    ],
     "require": {
-        "php": ">=5.4.0"
+        "php": "^5.4 || ^7.0 || ^8.0"
     },
     "require-dev": {
-        "mindplay/testies": "^0.3",
-        "phpunit/php-code-coverage": "^2.2.4"
+        "mindplay/testies": "1.0.0.x-dev"
     },
     "suggest": {
         "ext-intl": "provides better/faster support for slug-creation in URL helpers"
