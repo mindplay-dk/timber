@@ -6,6 +6,8 @@ use mindplay\timber\Result;
 use mindplay\timber\Router;
 use mindplay\timber\UrlHelper;
 
+use function mindplay\testies\{ test, ok, eq, expect, configure, run };
+
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 class SlugTester extends UrlHelper

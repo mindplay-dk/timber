@@ -1,6 +1,6 @@
 # mindplay/timber
 
-[![PHP Version](https://img.shields.io/badge/php-5.4%2B-blue.svg)](https://packagist.org/packages/mindplay/timber)
+[![PHP Version](https://img.shields.io/badge/php-7.3%2B-blue.svg)](https://packagist.org/packages/mindplay/timber)
 [![Build Status](https://travis-ci.org/mindplay-dk/timber.svg)](https://travis-ci.org/mindplay-dk/timber)
 
 Timber is a request router with regular expression support, high performance, and a

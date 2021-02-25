@@ -7,7 +7,7 @@ namespace mindplay\timber;
  *
  * @see Router::match()
  */
-class Match
+class MatchInfo
 {
     /**
      * @param Route    $route  the Route that matched the URL
