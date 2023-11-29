@@ -1,6 +1,7 @@
 # mindplay/timber
 
 [![PHP Version](https://img.shields.io/badge/php-8.0%2B-blue.svg)](https://packagist.org/packages/mindplay/timber)
+[![Build status](https://github.com/mindplay-dk/timber/actions/workflows/ci.yml/badge.svg)
 
 Timber is a router library with regular expression support, high performance, and a
 developer-friendly, human-readable API.
