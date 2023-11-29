@@ -4,24 +4,26 @@ namespace mindplay\timber;
 
 /**
  * This model represents an error generated while attempting to dispatch a Router.
- *
- * @see Result::$error
  */
 class Error
 {
-    public function __construct(int $code, string $message)
-    {
-        $this->code = $code;
-        $this->message = $message;
-    }
-
     /**
-     * @var int error code
+     * @var string the attempted URL
      */
-    public int $code;
+    public string $url;
 
     /**
-     * @var string error message
+     * @var string the attempted HTTP method
+     */
+    public string $method;
+
+    /**
+     * @var int HTTP status code
+     */
+    public int $status;
+
+    /**
+     * @var string HTTP status message
      */
     public string $message;
 
@@ -29,4 +31,13 @@ class Error
      * @var string[] list of allowed HTTP methods
      */
     public array $allowed = [];
+
+    public function __construct(string $url, string $method, int $status, string $message, array $allowed)
+    {
+        $this->url = $url;
+        $this->method = $method;
+        $this->status = $status;
+        $this->message = $message;
+        $this->allowed = $allowed;
+    }
 }

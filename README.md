@@ -27,6 +27,8 @@ Basic usage of the router looks like this:
 
 ```PHP
 use mindplay\timber\Router;
+use mindplay\timber\Result;
+use mindplay\timber\Error;
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -57,25 +59,12 @@ $url = '/news/1';
 
 $result = $router->resolve($method, $url);
 
-// TODO update example:
-
-if (!$result->error) {
-    $handler = $result->handler;
-    $params = $result->params;
-    // Do something with handler and params
+if ($result instanceof Error) {
+    header("HTTP/1.1 {$result->status} ${result->message}");
+    // ...error response here...
+    return;
 } else {
-    switch ($result->error->code) {
-        case 404 :
-            // Not found handler here
-            break;
-        case 405 :
-            // Method not allowed handler here
-            $allowedMethods = $result->error->allowed;
-            if ($method == 'OPTIONS') {
-                // OPTIONS method handler here
-            }
-            break;
-    }
+    // ...dispatch $result->handler with $result->params...
 }
 ```
 

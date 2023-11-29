@@ -20,6 +20,7 @@ have been removed from version `3.0.0` of this package:
 
 Major breaking changes:
 
+- `Router::resolve()` now returns a union type of either `Result` or `Error`.
 - `Registry` is now called `PatternRegistry`, and `Symbol` is called `Pattern`.
 
 Minor breaking changes:

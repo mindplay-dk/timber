@@ -1,24 +1,25 @@
 <?php
 
 use mindplay\timber\Result;
+use mindplay\timber\Error;
 use mindplay\timber\Router;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 use function mindplay\testies\{ configure, run, test, eq, ok, expect };
 
-function check_error(Result $result, $code)
+function check_error(Result|Error $result, int $status)
 {
-    ok($result->error !== null, 'expected Error instance');
+    ok($result instanceof Error, 'expected Error instance');
 
-    if ($result->error) {
-        eq($result->error->code, $code);
+    if ($result instanceof Error) {
+        eq($result->status, $status);
     }
 }
 
-function check_success(Result $result)
+function check_success(Result|Error $result)
 {
-    ok(empty($result->error));
+    ok($result instanceof Result);
 }
 
 test(
@@ -58,7 +59,9 @@ test(
 
         check_error($result, 405);
 
-        eq($result->error->allowed, ['GET']);
+        if ($result instanceof Error) {
+            eq($result->allowed, ['GET']);
+        }
     }
 );
 

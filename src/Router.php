@@ -173,31 +173,45 @@ class Router
      * @param string $method HTTP method name
      * @param string $url
      *
-     * @return Result
+     * @return Result|Error the result for the attempted route
      */
-    public function resolve(string $method, string $url): Result
+    public function resolve(string $method, string $url): Result|Error
     {
         $match = $this->match($url);
 
-        $result = new Result();
-        $result->url = $match ? $match->url : '/' . ltrim($url, '/');
-        $result->method = $method;
+        $url = $match
+            ? $match->url
+            : '/' . ltrim($url, '/');
 
-        if (!$match) {
-            $result->error = new Error(404, 'Not Found');
-        } else {
-            $result->route = $match->route;
-            $result->params = $match->params;
-
-            if (isset($match->route->handlers[$method])) {
-                $result->handler = $match->route->handlers[$method];
-            } else {
-                $result->error = new Error(405, 'Method Not Allowed');
-                $result->error->allowed = array_keys($match->route->handlers);
-            }
+        if (! $match) {
+            return new Error(
+                $url,
+                $method,
+                status: 404,
+                message: 'Not Found',
+                allowed: []
+            );
         }
 
-        return $result;
+        $handler = $match->route->handlers[$method] ?? null;
+
+        if (! $handler) {
+            return new Error(
+                $url,
+                $method,
+                status: 405,
+                message: 'Method Not Allowed',
+                allowed: array_keys($match->route->handlers)
+            );
+        }
+
+        return new Result(
+            $url,
+            $method,
+            $match->route,
+            $match->params,
+            $handler
+        );
     }
 
     public function getRoutes(): Route

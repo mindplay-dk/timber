@@ -30,12 +30,16 @@ class Result
     public array $params = [];
 
     /**
-     * Handler defined for the attempted HTTP method (or NULL, if this Result is an error) // TODO improve this: union types?
+     * Handler name for the resolved HTTP method
      */
-    public ?string $handler; // TODO use a callable type? (callbacks can't be serialized!)
+    public string $handler;
 
-    /**
-     * Error information (or NULL, if this Result is a success)
-     */
-    public ?Error $error = null;
+    public function __construct(string $url, string $method, Route $route, array $params, string $handler)
+    {
+        $this->url = $url;
+        $this->method = $method;
+        $this->route = $route;
+        $this->params = $params;
+        $this->handler = $handler;
+    }
 }
