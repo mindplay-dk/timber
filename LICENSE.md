@@ -1,3 +1,4 @@
+Copyright (c) 2023, Rasmus Schultz
 Copyright (c) 2015, Vadim Baryshev
 All rights reserved.
 
