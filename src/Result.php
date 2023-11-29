@@ -12,30 +12,30 @@ class Result
     /**
      * @var string the attempted URL
      */
-    public $url;
+    public string $url;
 
     /**
      * @var string the attempted HTTP method
      */
-    public $method;
+    public string $method;
 
     /**
      * @var Route matched Route
      */
-    public $route;
+    public Route $route;
 
     /**
-     * @var mixed[] map where parameter name => parameter value
+     * Map where parameter name => parameter value
      */
-    public $params = array();
+    public array $params = [];
 
     /**
-     * @var string|null handler defined for the attempted HTTP method (or NULL, if this Result is an error)
+     * Handler defined for the attempted HTTP method (or NULL, if this Result is an error) // TODO improve this: union types?
      */
-    public $handler;
+    public ?string $handler; // TODO use a callable type? (callbacks can't be serialized!)
 
     /**
-     * @var Error|null error information (or NULL, if this Result is a success)
+     * Error information (or NULL, if this Result is a success)
      */
-    public $error;
+    public ?Error $error = null;
 }

@@ -9,11 +9,7 @@ namespace mindplay\timber;
  */
 class Error
 {
-    /**
-     * @param int $code
-     * @param string $message
-     */
-    public function __construct($code, $message)
+    public function __construct(int $code, string $message)
     {
         $this->code = $code;
         $this->message = $message;
@@ -22,15 +18,15 @@ class Error
     /**
      * @var int error code
      */
-    public $code;
+    public int $code;
 
     /**
      * @var string error message
      */
-    public $message;
+    public string $message;
 
     /**
      * @var string[] list of allowed HTTP methods
      */
-    public $allowed = array();
+    public array $allowed = [];
 }

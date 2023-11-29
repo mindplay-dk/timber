@@ -17,13 +17,10 @@
         }
     ],
     "require": {
-        "php": "^7.3 || ^8.0"
+        "php": "^8.0"
     },
     "require-dev": {
         "mindplay/testies": "^1.0"
-    },
-    "suggest": {
-        "ext-intl": "provides better/faster support for slug-creation in URL helpers"
     },
     "autoload": {
         "psr-4": {

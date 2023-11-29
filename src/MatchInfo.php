@@ -10,11 +10,11 @@ namespace mindplay\timber;
 class MatchInfo
 {
     /**
-     * @param Route    $route  the Route that matched the URL
-     * @param string   $url    the URL that was matched
+     * @param $route the Route that matched the URL
+     * @param $url the URL that was matched
      * @param string[] $params captured parameters
      */
-    public function __construct(Route $route, $url, $params)
+    public function __construct(Route $route, string $url, array $params)
     {
         $this->route = $route;
         $this->url = $url;
@@ -24,15 +24,15 @@ class MatchInfo
     /**
      * @var Route the matched Route
      */
-    public $route;
+    public Route $route;
 
     /**
      * @var string the URL that was matched
      */
-    public $url;
+    public string $url;
 
     /**
      * @var string[] map where parameter name => parameter
      */
-    public $params;
+    public array $params;
 }

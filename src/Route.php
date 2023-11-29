@@ -5,64 +5,56 @@ namespace mindplay\timber;
 use RuntimeException;
 
 /**
- * This class represents a route, or part of a route, within a Router.
+ * This class represents a route (or part of a route) within a `Router`.
  */
 class Route
 {
     /**
-     * @var string route pattern
+     * Route pattern
      */
-    public $pattern;
+    public string $pattern = "";
 
     /**
      * @var string[] map where parameter name => regular expression pattern (or symbol name)
      */
-    public $params;
+    public array $params;
 
     /**
      * @var string[] map where HTTP method => handler name
      */
-    public $handlers = array();
+    public $handlers = [];
 
     /**
      * @var Route[] list of nested Route instances
      */
-    public $children = array();
+    public $children = [];
 
     /**
      * @var Route[] map where regular expression => nested Route instance
      */
-    public $regexps = array();
+    public $regexps = [];
 
     /**
-     * @var Route|null the wildcard Route (if any)
+     * The wildcard Route (if any)
      */
-    public $wildcard;
+    public ?Route $wildcard;
 
     /**
-     * @var string|null wildcard parameter name (if any)
+     * Wildcard parameter name (if any)
      */
-    public $wildcard_name;
+    public ?string $wildcard_name;
 
-    /**
-     * @var Registry
-     */
-    protected $registry;
+    private PatternRegistry $registry;
 
-    /**
-     * @param Registry $registry
-     */
-    public function __construct(Registry $registry)
+    public function __construct(PatternRegistry $registry)
     {
         $this->registry = $registry;
     }
 
     /**
-     * @param string $pattern
-     *
-     * @return Route the created Route object
+     * Define a route.
      */
-    public function route($pattern)
+    public function route(string $pattern): Route
     {
         $parts = explode('/', trim($pattern, '/'));
 
@@ -101,8 +93,8 @@ class Route
                             $pattern = '/.*$';
                             $is_wildcard = true;
                             $wildcard_name = $name;
-                        } elseif (isset($this->registry->symbols[$pattern])) {
-                            $symbol = $this->registry->symbols[$pattern];
+                        } elseif (isset($this->registry->patterns[$pattern])) {
+                            $symbol = $this->registry->patterns[$pattern];
                             $pattern = $symbol->expression;
                         }
                     }
@@ -150,99 +142,61 @@ class Route
         return $current;
     }
 
-    /**
-     * @param string $handler
-     *
-     * @return $this
-     */
-    public function options($handler)
+    public function options(string $handler): self
     {
         $this->handlers['OPTIONS'] = $handler;
 
         return $this;
     }
 
-    /**
-     * @param string $handler
-     *
-     * @return $this
-     */
-    public function get($handler)
+    public function get(string $handler): self
     {
         $this->handlers['GET'] = $handler;
 
         return $this;
     }
 
-    /**
-     * @param string $handler
-     *
-     * @return $this
-     */
-    public function head($handler)
+    public function head(string $handler): self
     {
         $this->handlers['HEAD'] = $handler;
 
         return $this;
     }
 
-    /**
-     * @param string $handler
-     *
-     * @return $this
-     */
-    public function post($handler)
+    public function post(string $handler): self
     {
         $this->handlers['POST'] = $handler;
 
         return $this;
     }
 
-    /**
-     * @param string $handler
-     *
-     * @return $this
-     */
-    public function put($handler)
+    public function put(string $handler): self
     {
         $this->handlers['PUT'] = $handler;
 
         return $this;
     }
 
-    /**
-     * @param string $handler
-     *
-     * @return $this
-     */
-    public function delete($handler)
+    public function delete(string $handler): self
     {
         $this->handlers['DELETE'] = $handler;
 
         return $this;
     }
 
-    /**
-     * @param string $handler
-     *
-     * @return $this
-     */
-    public function trace($handler)
+    public function trace(string $handler): self
     {
         $this->handlers['TRACE'] = $handler;
 
         return $this;
     }
 
-    /**
-     * @param string $handler
-     *
-     * @return $this
-     */
-    public function connect($handler)
+    public function connect(string $handler): self
     {
         $this->handlers['CONNECT'] = $handler;
 
         return $this;
     }
+
+    // TODO HEAD and QUERY methods
 }
