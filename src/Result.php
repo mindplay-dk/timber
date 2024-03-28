@@ -12,30 +12,34 @@ class Result
     /**
      * @var string the attempted URL
      */
-    public $url;
+    public string $url;
 
     /**
      * @var string the attempted HTTP method
      */
-    public $method;
+    public string $method;
 
     /**
      * @var Route matched Route
      */
-    public $route;
+    public Route $route;
 
     /**
-     * @var mixed[] map where parameter name => parameter value
+     * Map where parameter name => parameter value
      */
-    public $params = array();
+    public array $params = [];
 
     /**
-     * @var string|null handler defined for the attempted HTTP method (or NULL, if this Result is an error)
+     * Handler name for the resolved HTTP method
      */
-    public $handler;
+    public string $handler;
 
-    /**
-     * @var Error|null error information (or NULL, if this Result is a success)
-     */
-    public $error;
+    public function __construct(string $url, string $method, Route $route, array $params, string $handler)
+    {
+        $this->url = $url;
+        $this->method = $method;
+        $this->route = $route;
+        $this->params = $params;
+        $this->handler = $handler;
+    }
 }

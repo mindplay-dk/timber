@@ -1,78 +1,25 @@
 <?php
 
-use mindplay\timber\Controller;
-use mindplay\timber\Dispatcher;
 use mindplay\timber\Result;
+use mindplay\timber\Error;
 use mindplay\timber\Router;
-use mindplay\timber\UrlHelper;
-
-use function mindplay\testies\{ test, ok, eq, expect, configure, run };
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-class SlugTester extends UrlHelper
+use function mindplay\testies\{ configure, run, test, eq, ok, expect };
+
+function check_error(Result|Error $result, int $status)
 {
-    /**
-     * @param string $input
-     * @param string $expected
-     *
-     * @return string
-     */
-    public function test($input, $expected)
-    {
-        eq("{$this->slug($input)}", $expected);
+    ok($result instanceof Error, 'expected Error instance');
+
+    if ($result instanceof Error) {
+        eq($result->status, $status);
     }
 }
 
-class ReplaceTester extends UrlHelper
+function check_success(Result|Error $result)
 {
-    /**
-     * @param string $template
-     * @param array  $tokens
-     * @param string $expected
-     *
-     * @return string
-     */
-    public function test($template, $tokens, $expected)
-    {
-        eq($this->replace($template, $tokens), $expected);
-    }
-}
-
-class SampleUrlHelper extends UrlHelper
-{
-    /**
-     * @param int    $id
-     * @param string $title
-     *
-     * @return string
-     */
-    public function content($id, $title)
-    {
-        return "/content/{$id}/{$this->slug($title)}";
-    }
-}
-
-class SampleController implements Controller
-{
-    public function run($id, $title)
-    {
-        return [$id, $title];
-    }
-}
-
-function check_error(Result $result, $code)
-{
-    ok($result->error !== null, 'expected Error instance');
-
-    if ($result->error) {
-        eq($result->error->code, $code);
-    }
-}
-
-function check_success(Result $result)
-{
-    ok(empty($result->error));
+    ok($result instanceof Result);
 }
 
 test(
@@ -112,7 +59,9 @@ test(
 
         check_error($result, 405);
 
-        eq($result->error->allowed, ['GET']);
+        if ($result instanceof Error) {
+            eq($result->allowed, ['GET']);
+        }
     }
 );
 
@@ -142,7 +91,7 @@ test(
 
         eq($result->handler, 'handler2');
         eq($result->params['id'], 1);
-        ok(1 === $result->params['id'], 'int Symbol should convert to int');
+        ok(1 === $result->params['id'], 'int Pattern should convert to int');
 
         $result = $router->resolve('GET', '/news/foo');
 
@@ -292,81 +241,6 @@ test(
         eq($router->resolve('GET', '/admin/menu/save')->handler, 'save');
         eq($router->resolve('POST', '/admin/upload')->handler, 'upload');
         eq($router->route('admin/menu/load')->pattern, '/admin/menu/load');
-    }
-);
-
-test(
-    'should dispatch handlers with parameters',
-    function () {
-        $router = new Router();
-        $router->route('content/<id:int>-<title:slug>')->get('SampleController');
-
-        $dispatcher = new Dispatcher($router);
-
-        $result = $dispatcher->run('GET', '/content/123-hello-world');
-
-        eq($result, [123, 'hello-world']);
-    }
-);
-
-test(
-    'can create URL',
-    function () {
-        $router = new Router();
-        $router->route('content/<id:int>/<title:slug>')->get('content');
-
-        $url = new SampleUrlHelper();
-        $content_url = $url->content(123, 'Hello, World!');
-
-        eq($content_url, '/content/123/hello-world');
-        eq($router->resolve('GET', $content_url)->handler, 'content');
-    }
-);
-
-test(
-    'can create slugs',
-    function () {
-        $url = new SlugTester();
-
-        $url->test(' Hello, World! ', 'hello-world');
-
-        $url->test('__foo+bar--', 'foo-bar');
-
-        $url->test('áàâä', 'aaaa');
-
-        $url->test('æøå', 'aeoa');
-
-        $url->test('ÆØÅ', 'aeoa');
-
-        expect(
-            'InvalidArgumentException',
-            'should throw when no valid characters are present',
-            function () use ($url) {
-                $url->test('!@#$%!', '');
-            }
-        );
-    }
-);
-
-test(
-    'can replace tokens in templates',
-    function () {
-        $replace = new ReplaceTester();
-
-        $replace->test('foo/<bar>', ['bar' => 'hello'], 'foo/hello');
-
-        $replace->test('foo/<bar:slug>', ['bar' => 'hello'], 'foo/hello');
-
-        $replace->test('foo/<bar:slug>/<baz:\w+>', ['bar' => 'hello', 'baz' => 'world'], 'foo/hello/world');
-
-        expect(
-            'InvalidArgumentException',
-            'should throw for missing replacements token',
-            function () use ($replace) {
-                $replace->test('foo/<bar>/<baz>', ['bar' => 'hello'], 'foo/hello/');
-            },
-            '/for token: baz/'
-        );
     }
 );
 

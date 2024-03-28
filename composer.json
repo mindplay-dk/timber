@@ -8,22 +8,18 @@
     "license": "BSD-3-Clause",
     "authors": [
         {
-            "name": "Vadim Baryshev",
-            "email": "vadimbaryshev@gmail.com"
-        },
-        {
             "name": "Rasmus Schultz",
             "email": "rasmus@mindplay.dk"
         }
     ],
     "require": {
-        "php": "^7.3 || ^8.0"
+        "php": "^8.0"
     },
     "require-dev": {
-        "mindplay/testies": "^1.0"
+        "mindplay/testies": "^1.1.2"
     },
-    "suggest": {
-        "ext-intl": "provides better/faster support for slug-creation in URL helpers"
+    "scripts": {
+        "test": "php test/test.php"
     },
     "autoload": {
         "psr-4": {
