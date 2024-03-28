@@ -16,7 +16,10 @@
         "php": "^8.0"
     },
     "require-dev": {
-        "mindplay/testies": "^1.0"
+        "mindplay/testies": "^1.1.2"
+    },
+    "scripts": {
+        "test": "php test/test.php"
     },
     "autoload": {
         "psr-4": {
